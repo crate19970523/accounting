@@ -1,0 +1,29 @@
+server:
+  port: 8080
+  address: 0.0.0.0
+  servlet:
+    context-path: /
+spring:
+  profiles:
+    active: dev
+springdoc:
+  packages-to-scan: com.crater.accounting.controller
+  swagger-ui:
+    enabled: true
+    path: open-api.html
+logging:
+  file:
+    name: "./log/all.log"
+  logback:
+    rollingpolicy:
+      max-file-size: 100MB
+  level:
+    root: info
+    com:
+      crater:
+        hanaengine:
+          dao:
+            mapper: debug
+mybatis:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
