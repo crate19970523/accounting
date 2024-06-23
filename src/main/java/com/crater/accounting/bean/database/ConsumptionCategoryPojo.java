@@ -7,28 +7,26 @@ public class ConsumptionCategoryPojo {
     private Integer serNo;
     private String name;
     private Boolean isForSaving;
-    private Boolean isAutoSaving;
     private LocalDateTime createTime;
     private String createUser;
     private LocalDateTime updateTime;
     private String updateUser;
-    private Integer autoSavingDate;
+    private Boolean isActive;
 
     public ConsumptionCategoryPojo() {
     }
 
-    public ConsumptionCategoryPojo(Integer serNo, String name, Boolean isForSaving, Boolean isAutoSaving,
+    public ConsumptionCategoryPojo(Integer serNo, String name, Boolean isForSaving,
                                    LocalDateTime createTime, String createUser, LocalDateTime updateTime,
-                                   String updateUser, Integer autoSavingDate) {
+                                   String updateUser, Boolean isActive) {
         this.serNo = serNo;
         this.name = name;
         this.isForSaving = isForSaving;
-        this.isAutoSaving = isAutoSaving;
         this.createTime = createTime;
         this.createUser = createUser;
         this.updateTime = updateTime;
         this.updateUser = updateUser;
-        this.autoSavingDate = autoSavingDate;
+        this.isActive = isActive;
     }
 
     public ConsumptionCategoryPojo setSerNo(Integer serNo) {
@@ -43,11 +41,6 @@ public class ConsumptionCategoryPojo {
 
     public ConsumptionCategoryPojo setForSaving(Boolean forSaving) {
         isForSaving = forSaving;
-        return this;
-    }
-
-    public ConsumptionCategoryPojo setAutoSaving(Boolean autoSaving) {
-        isAutoSaving = autoSaving;
         return this;
     }
 
@@ -71,8 +64,8 @@ public class ConsumptionCategoryPojo {
         return this;
     }
 
-    public ConsumptionCategoryPojo setAutoSavingDate(Integer autoSavingDate) {
-        this.autoSavingDate = autoSavingDate;
+    public ConsumptionCategoryPojo setActive(Boolean active) {
+        isActive = active;
         return this;
     }
 
@@ -86,10 +79,6 @@ public class ConsumptionCategoryPojo {
 
     public Boolean isForSaving() {
         return isForSaving;
-    }
-
-    public Boolean isAutoSaving() {
-        return isAutoSaving;
     }
 
     public LocalDateTime createTime() {
@@ -108,8 +97,8 @@ public class ConsumptionCategoryPojo {
         return updateUser;
     }
 
-    public Integer autoSavingDate() {
-        return autoSavingDate;
+    public Boolean isActive() {
+        return isActive;
     }
 
     @Override
@@ -120,17 +109,15 @@ public class ConsumptionCategoryPojo {
         return Objects.equals(this.serNo, that.serNo) &&
                 Objects.equals(this.name, that.name) &&
                 Objects.equals(this.isForSaving, that.isForSaving) &&
-                Objects.equals(this.isAutoSaving, that.isAutoSaving) &&
                 Objects.equals(this.createTime, that.createTime) &&
                 Objects.equals(this.createUser, that.createUser) &&
                 Objects.equals(this.updateTime, that.updateTime) &&
-                Objects.equals(this.updateUser, that.updateUser) &&
-                Objects.equals(this.autoSavingDate, that.autoSavingDate);
+                Objects.equals(this.updateUser, that.updateUser);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(serNo, name, isForSaving, isAutoSaving, createTime, createUser, updateTime, updateUser, autoSavingDate);
+        return Objects.hash(serNo, name, isForSaving, createTime, createUser, updateTime, updateUser);
     }
 
     @Override
@@ -139,12 +126,10 @@ public class ConsumptionCategoryPojo {
                 "serNo=" + serNo + ", " +
                 "name=" + name + ", " +
                 "isForSaving=" + isForSaving + ", " +
-                "isAutoSaving=" + isAutoSaving + ", " +
                 "createTime=" + createTime + ", " +
                 "createUser=" + createUser + ", " +
                 "updateTime=" + updateTime + ", " +
-                "updateUser=" + updateUser + ", " +
-                "autoSavingDate=" + autoSavingDate + ']';
+                "updateUser=" + updateUser + ", " + ']';
     }
 
 }

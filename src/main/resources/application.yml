@@ -10,7 +10,7 @@ springdoc:
   packages-to-scan: com.crater.accounting.controller
   swagger-ui:
     enabled: true
-    path: open-api.html
+    path: open-api
 logging:
   file:
     name: "./log/all.log"
@@ -27,3 +27,7 @@ logging:
 mybatis:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+accounting:
+  schedule:
+    autoSaving: "0 0 1 * * ?"
