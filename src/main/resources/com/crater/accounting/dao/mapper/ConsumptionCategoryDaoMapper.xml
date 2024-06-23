@@ -2,21 +2,20 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.crater.accounting.dao.mapper.consumptionCategoryDaoMapper">
     <insert id="insert" parameterType="com.crater.accounting.bean.database.ConsumptionCategoryPojo">
-        INSERT INTO CONSUMPTION_CATEGORY (NAME, IS_FOR_SAVING, IS_AUTO_SAVING, CREATE_USER, AUTO_SAVING_DATE)
-        VALUES (#{name}, #{isForSaving}, #{isAutoSaving}, #{createUser}, #{autoSavingDate})
+        INSERT INTO CONSUMPTION_CATEGORY (NAME, IS_FOR_SAVING, CREATE_USER, IS_ACTIVE)
+        VALUES (#{name}, #{isForSaving}, #{createUser}, #{isActive})
     </insert>
 
     <update id="update" parameterType="com.crater.accounting.bean.database.ConsumptionCategoryPojo">
-        update ACCOUNTING.CONSUMPTION_CATEGORY
+        update CONSUMPTION_CATEGORY
         <set>
             <if test="name != null">NAME = #{name},</if>
             <if test="createTime != null">CRATE_TIME = #{createTime},</if>
             <if test="createUser != null">CRATE_USER = #{createUser},</if>
             <if test="updateTime != null">UPDATE_TIME = #{updateTime},</if>
-            <if test="updateUser != null">UPDATE_USER = #{updateUser}</if>
-            <if test="isForSaving != null">IS_FOR_SAVING = #{isForSaving}</if>
-            <if test="isAutoSaving != null">IS_AUTO_SAVING = #{isAutoSaving}</if>
-            <if test="autoSavingDate != null">AUTO_SAVING_DATE  = #{autoSavingDate}</if>
+            <if test="updateUser != null">UPDATE_USER = #{updateUser},</if>
+            <if test="isForSaving != null">IS_FOR_SAVING = #{isForSaving},</if>
+            <if test="isActive != null">IS_ACTIVE = #{isActive}</if>
         </set>
         where SER_NO = #{serNo}
     </update>
@@ -37,6 +36,7 @@
             <if test="createUser != null">AND CRATE_USER = #{createUser}</if>
             <if test="updateTime != null">AND UPDATE_TIME = #{updateTime}</if>
             <if test="updateUser != null">AND UPDATE_USER = #{updateUser}</if>
+            <if test="isActive != null">AND IS_ACTIVE = #{isActive}</if>
         </where>
         ORDER BY SER_NO
     </select>
@@ -52,6 +52,7 @@
             <if test="createUser != null">AND CRATE_USER = #{createUser}</if>
             <if test="updateTime != null">AND UPDATE_TIME = #{updateTime}</if>
             <if test="updateUser != null">AND UPDATE_USER = #{updateUser}</if>
+            <if test="isActive != null">AND IS_ACTIVE = #{isActive}</if>
         </where>
         ORDER BY SER_NO
     </select>
@@ -66,5 +67,6 @@
         <result property="updateTime" column="UPDATE_TIME"/>
         <result property="updateUser" column="UPDATE_USER"/>
         <result property="autoSavingDate" column="AUTO_SAVING_DATE"/>
+        <result property="isActive" column="IS_ACTIVE"/>
     </resultMap>
 </mapper>

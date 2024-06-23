@@ -59,8 +59,8 @@ public class CategoryController {
         if (StringUtils.isBlank(userId)) {
             errorMessage.add("User-ID cant be blank!");
         }
-        if(addNewCategoryRequest.isAutoSaving() && addNewCategoryRequest.autoSavingDate() == null) {
-            errorMessage.add("autoSavingDate cant be null");
+        if (addNewCategoryRequest.isActive() == null) {
+            errorMessage.add("active cant be null");
         }
         if (!errorMessage.isEmpty()) {
             throw new RequestFormatException(StringUtils.join(errorMessage, "\n"));
@@ -69,8 +69,7 @@ public class CategoryController {
 
     private AddNewCategoryDto generateAddNewCategoryDto(AddNewCategoryRequest addNewCategoryRequest, String userId) {
         return new AddNewCategoryDto(addNewCategoryRequest.name(), userId, addNewCategoryRequest.isForSaving(),
-                addNewCategoryRequest.isAutoSaving(),
-                addNewCategoryRequest.isAutoSaving() ? addNewCategoryRequest.autoSavingDate() : null);
+                addNewCategoryRequest.isActive());
     }
 
     @Operation(summary = "update category", description = "update category data")
@@ -104,8 +103,7 @@ public class CategoryController {
 
     private UpdateCategoryDto generateUpdateCatalogDto(UpdateGetCategoryRequest updateGetCategoryRequest, String userId) {
         return new UpdateCategoryDto(updateGetCategoryRequest.serialNo(), updateGetCategoryRequest.name(),
-                updateGetCategoryRequest.isForSaving(), updateGetCategoryRequest.isAutoSaving(),
-                updateGetCategoryRequest.autoSavingDate(), userId);
+                updateGetCategoryRequest.isForSaving(), userId, updateGetCategoryRequest.isActive());
     }
 
     @Operation(summary = "get category 目錄", description = "取得消費類型目錄")
@@ -153,13 +151,10 @@ public class CategoryController {
             var formatedUpdateTime = queryCategoryResultDto.updateTime() == null ? null :
                     queryCategoryResultDto.updateTime().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
             return new GetCategoryResponse(Status.generateSuccessStatus(),
-                    new CategoryData(queryCategoryResultDto.serialNo(),
-                            queryCategoryResultDto.name(),
+                    new CategoryData(queryCategoryResultDto.serialNo(), queryCategoryResultDto.name(),
                             queryCategoryResultDto.createTime().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
-                            queryCategoryResultDto.createUser(),
-                            formatedUpdateTime,
-                            queryCategoryResultDto.updateUser(), queryCategoryResultDto.isForSaving(),
-                            queryCategoryResultDto.isAutoSaving(), queryCategoryResultDto.autoSavingDate()));
+                            queryCategoryResultDto.createUser(), formatedUpdateTime, queryCategoryResultDto.updateUser(),
+                            queryCategoryResultDto.isForSaving(), queryCategoryResultDto.isActive()));
         } catch (Exception e) {
             throw new GenerateResponseException("generate get category response error", e);
         }
