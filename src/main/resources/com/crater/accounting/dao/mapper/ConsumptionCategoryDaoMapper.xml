@@ -2,8 +2,8 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.crater.accounting.dao.mapper.consumptionCategoryDaoMapper">
     <insert id="insert" parameterType="com.crater.accounting.bean.database.ConsumptionCategoryPojo">
-        INSERT INTO CONSUMPTION_CATEGORY (NAME, IS_FOR_SAVING, CREATE_USER, IS_ACTIVE)
-        VALUES (#{name}, #{isForSaving}, #{createUser}, #{isActive})
+        INSERT INTO CONSUMPTION_CATEGORY (NAME, IS_FOR_SAVING, CREATE_USER, IS_ACTIVE, USER_ID)
+        VALUES (#{name}, #{isForSaving}, #{createUser}, #{isActive}, #{userId})
     </insert>
 
     <update id="update" parameterType="com.crater.accounting.bean.database.ConsumptionCategoryPojo">
@@ -15,7 +15,8 @@
             <if test="updateTime != null">UPDATE_TIME = #{updateTime},</if>
             <if test="updateUser != null">UPDATE_USER = #{updateUser},</if>
             <if test="isForSaving != null">IS_FOR_SAVING = #{isForSaving},</if>
-            <if test="isActive != null">IS_ACTIVE = #{isActive}</if>
+            <if test="isActive != null">IS_ACTIVE = #{isActive},</if>
+            <if test="userId != null">USER_ID = #{userId},</if>
         </set>
         where SER_NO = #{serNo}
     </update>
@@ -27,7 +28,7 @@
 
     <select id="selectSerNoAndName" parameterType="com.crater.accounting.bean.database.ConsumptionCategoryPojo"
         resultMap="categoryResultMap">
-        SELECT *
+        SELECT SER_NO, NAME, COALESCE(UPDATE_TIME, CREATE_TIME) AS UPDATE_TIME
         FROM CONSUMPTION_CATEGORY
         <where>
             <if test="serNo != null">AND SER_NO = #{serNo}</if>
@@ -37,6 +38,7 @@
             <if test="updateTime != null">AND UPDATE_TIME = #{updateTime}</if>
             <if test="updateUser != null">AND UPDATE_USER = #{updateUser}</if>
             <if test="isActive != null">AND IS_ACTIVE = #{isActive}</if>
+            <if test="userId != null">AND USER_ID = #{userId}</if>
         </where>
         ORDER BY SER_NO
     </select>
@@ -53,6 +55,7 @@
             <if test="updateTime != null">AND UPDATE_TIME = #{updateTime}</if>
             <if test="updateUser != null">AND UPDATE_USER = #{updateUser}</if>
             <if test="isActive != null">AND IS_ACTIVE = #{isActive}</if>
+             <if test="userId != null">AND USER_ID = #{userId}</if>
         </where>
         ORDER BY SER_NO
     </select>
@@ -68,5 +71,6 @@
         <result property="updateUser" column="UPDATE_USER"/>
         <result property="autoSavingDate" column="AUTO_SAVING_DATE"/>
         <result property="isActive" column="IS_ACTIVE"/>
+        <result property="userId" column="USER_ID"/>
     </resultMap>
 </mapper>

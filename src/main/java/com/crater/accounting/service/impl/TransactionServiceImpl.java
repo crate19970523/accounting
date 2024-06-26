@@ -30,7 +30,8 @@ public class TransactionServiceImpl implements TransactionService {
     private TransactionPojo generateAddTransactionPojo(AddTransactionDto addTransactionDto) {
         return new TransactionPojo(null, addTransactionDto.categorySerialNo(), addTransactionDto.name(),
                 addTransactionDto.amount(), LocalDateTime.now(), addTransactionDto.userId(), null,
-                null, addTransactionDto.transactionTime(), null, null);
+                null, addTransactionDto.transactionTime(), null, null,
+                addTransactionDto.userId());
     }
 
     private void callDaoToInsertTransaction(TransactionPojo transactionPojo) {
@@ -47,7 +48,7 @@ public class TransactionServiceImpl implements TransactionService {
         try {
             transactionDao.delete(new TransactionPojo(transactionSerialNo, null, null,
                     null, null, null, null, null, null,
-                    null, null));
+                    null, null, null));
         } catch (Exception e) {
             throw new DbException("Failed to delete transaction", e);
         }
@@ -65,7 +66,7 @@ public class TransactionServiceImpl implements TransactionService {
         var endDateForQueryPojo = transactionDto.queryEndDate() == null ? null : transactionDto.queryEndDate().atTime(23, 59, 59);
         return new TransactionPojo(transactionDto.serNo(), transactionDto.consumptionCategorySerNo(), transactionDto.name(),
                 null, null, null, null, null,
-                null, startDateForQueryPojo, endDateForQueryPojo);
+                null, startDateForQueryPojo, endDateForQueryPojo, transactionDto.userId());
     }
 
     private List<TransactionPojo> callDaoToQueryTransaction(TransactionPojo transactionPojo) {
@@ -78,7 +79,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     private List<GetTransactionResultDto> generateGetTransactionResultDtos(List<TransactionPojo> transactionPojos) {
         return transactionPojos.stream().map(t -> new GetTransactionResultDto(t.serNo(), t.consumptionCategorySerNo(),
-                t.name(), t.amount(), t.createTime(), t.crateUser(), t.updateTime(), t.updateUser(), t.transactionTime())).toList();
+                t.name(), t.amount(), t.createTime(), t.createUser(), t.updateTime(), t.updateUser(), t.transactionTime())).toList();
     }
 
     @Override
@@ -93,7 +94,7 @@ public class TransactionServiceImpl implements TransactionService {
         return new TransactionPojo(updateTransactionDto.serialNo(), updateTransactionDto.categorySerialNo(),
                 updateTransactionDto.name(), updateTransactionDto.amount(), null, null,
                 LocalDateTime.now(), updateTransactionDto.userId(),updateTransactionDto.transactionTime(),
-                null, null);
+                null, null, updateTransactionDto.userId());
     }
 
     private void callDaoToUpdateTransaction(TransactionPojo transactionPojo) {

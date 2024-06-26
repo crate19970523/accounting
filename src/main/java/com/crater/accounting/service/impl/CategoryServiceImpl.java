@@ -33,7 +33,7 @@ public class CategoryServiceImpl implements CategoryService {
     private ConsumptionCategoryPojo generateCategoryPojo(AddNewCategoryDto addNewCategoryDto) {
         return new ConsumptionCategoryPojo(null, addNewCategoryDto.name(), addNewCategoryDto.isForSaving(),
                 LocalDateTime.now(), addNewCategoryDto.userId(), null, null,
-                addNewCategoryDto.isActive());
+                addNewCategoryDto.isActive(), addNewCategoryDto.userId());
     }
 
     private void callDaoToInsertCategory(ConsumptionCategoryPojo categoryPojo) {
@@ -76,7 +76,7 @@ public class CategoryServiceImpl implements CategoryService {
         return new ConsumptionCategoryPojo(updateCategoryDto.serialNo(), updateCategoryDto.name(),
                 updateCategoryDto.isForSaving(), null, null,
                 LocalDateTime.now(), updateCategoryDto.user(),
-                updateCategoryDto.isActive());
+                updateCategoryDto.isActive(), updateCategoryDto.user());
     }
 
     private void callDaoToUpdateCategory(ConsumptionCategoryPojo categoryPojo) {
@@ -96,7 +96,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     private ConsumptionCategoryPojo generateCategoryPojo(int serialNo) {
         return new ConsumptionCategoryPojo(serialNo, null, null, null, null,
-                null, null, null);
+                null, null, null, null);
     }
 
     private ConsumptionCategoryPojo callDaoQueryCategory(ConsumptionCategoryPojo categoryPojo) {
@@ -128,7 +128,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     private ConsumptionCategoryPojo generateCategoryPojo(QueryCategoryDto queryCategoryDto) {
         return new ConsumptionCategoryPojo(queryCategoryDto.serialNo(), queryCategoryDto.name(), null,
-                null, null, null, null, null);
+                null, null, null, null, null, null);
     }
 
     private List<ConsumptionCategoryPojo> callDaoQueryCategoriesIndex(ConsumptionCategoryPojo categoryPojo) {

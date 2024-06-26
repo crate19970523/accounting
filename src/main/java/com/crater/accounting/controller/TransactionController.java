@@ -63,13 +63,15 @@ public class TransactionController {
     }
 
     @GetMapping("transactionController/transaction")
-    public GetTransactionResponse getTransaction(@RequestParam(value = "serialNo", required = false) Integer serialNo,
+    public GetTransactionResponse getTransaction(@RequestHeader(name = "User-ID") String userId,
+                                                @RequestParam(value = "serialNo", required = false) Integer serialNo,
                                                  @RequestParam(value = "categorySerNo", required = false) Integer categorySerNo,
                                                  @RequestParam(value = "name", required = false) String name,
                                                  @RequestParam(value = "startDate", required = false) String startDate,
                                                  @RequestParam(value = "endDate", required = false) String endDate) {
         try {
-            var queryTransactionDto = generateQueryTransactionDto(serialNo, categorySerNo, name, startDate, endDate);
+            var queryTransactionDto = generateQueryTransactionDto(serialNo, categorySerNo, name, startDate, endDate,
+                    userId);
             var queryTransactionResultDto = transactionService.getTransaction(queryTransactionDto);
             return generateGetTransactionResponse(queryTransactionResultDto);
         } catch (Exception e) {
@@ -78,12 +80,11 @@ public class TransactionController {
         }
     }
 
-    private GetTransactionDto generateQueryTransactionDto(Integer serialNo, Integer categorySerNo,
-                                                          String name, String startDate, String endDate) {
+    private GetTransactionDto generateQueryTransactionDto(Integer serialNo, Integer categorySerNo, String name,
+                                                          String startDate, String endDate, String userId) {
         var startDateForDto = startDate == null ? null : LocalDate.parse(startDate, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
         var endDateForDto = endDate == null ? null : LocalDate.parse(endDate, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-        return new GetTransactionDto(serialNo, categorySerNo, name, startDateForDto,
-                endDateForDto);
+        return new GetTransactionDto(serialNo, categorySerNo, name, startDateForDto, endDateForDto, userId);
     }
 
     private GetTransactionResponse generateGetTransactionResponse(List<GetTransactionResultDto> getTransactionResultDtos) {

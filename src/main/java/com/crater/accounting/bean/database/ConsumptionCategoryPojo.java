@@ -1,7 +1,6 @@
 package com.crater.accounting.bean.database;
 
 import java.time.LocalDateTime;
-import java.util.Objects;
 
 public class ConsumptionCategoryPojo {
     private Integer serNo;
@@ -12,13 +11,14 @@ public class ConsumptionCategoryPojo {
     private LocalDateTime updateTime;
     private String updateUser;
     private Boolean isActive;
+    private String userId;
 
     public ConsumptionCategoryPojo() {
     }
 
     public ConsumptionCategoryPojo(Integer serNo, String name, Boolean isForSaving,
                                    LocalDateTime createTime, String createUser, LocalDateTime updateTime,
-                                   String updateUser, Boolean isActive) {
+                                   String updateUser, Boolean isActive, String userId) {
         this.serNo = serNo;
         this.name = name;
         this.isForSaving = isForSaving;
@@ -27,6 +27,7 @@ public class ConsumptionCategoryPojo {
         this.updateTime = updateTime;
         this.updateUser = updateUser;
         this.isActive = isActive;
+        this.userId = userId;
     }
 
     public ConsumptionCategoryPojo setSerNo(Integer serNo) {
@@ -69,6 +70,11 @@ public class ConsumptionCategoryPojo {
         return this;
     }
 
+    public ConsumptionCategoryPojo setUserId(String userId) {
+        this.userId = userId;
+        return this;
+    }
+
     public Integer serNo() {
         return serNo;
     }
@@ -101,35 +107,7 @@ public class ConsumptionCategoryPojo {
         return isActive;
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == this) return true;
-        if (obj == null || obj.getClass() != this.getClass()) return false;
-        var that = (ConsumptionCategoryPojo) obj;
-        return Objects.equals(this.serNo, that.serNo) &&
-                Objects.equals(this.name, that.name) &&
-                Objects.equals(this.isForSaving, that.isForSaving) &&
-                Objects.equals(this.createTime, that.createTime) &&
-                Objects.equals(this.createUser, that.createUser) &&
-                Objects.equals(this.updateTime, that.updateTime) &&
-                Objects.equals(this.updateUser, that.updateUser);
+    public String userId() {
+        return userId;
     }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(serNo, name, isForSaving, createTime, createUser, updateTime, updateUser);
-    }
-
-    @Override
-    public String toString() {
-        return "ConsumptionCategoryPojo[" +
-                "serNo=" + serNo + ", " +
-                "name=" + name + ", " +
-                "isForSaving=" + isForSaving + ", " +
-                "createTime=" + createTime + ", " +
-                "createUser=" + createUser + ", " +
-                "updateTime=" + updateTime + ", " +
-                "updateUser=" + updateUser + ", " + ']';
-    }
-
 }

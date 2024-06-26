@@ -3,9 +3,9 @@
 <mapper namespace="com.crater.accounting.dao.mapper.TransactionDaoMapper">
     <insert id="insert" parameterType="com.crater.accounting.bean.database.TransactionPojo">
         INSERT INTO TRANSACTION(CONSUMPTION_CATEGORY_SER_NO, NAME, AMOUNT, CREATE_TIME, CREATE_USER, UPDATE_TIME,
-                                UPDATE_USER, TRANSACTION_TIME)
+                                UPDATE_USER, TRANSACTION_TIME, USER_ID)
         VALUES (#{consumptionCategorySerNo}, #{name}, #{amount}, #{createTime}, #{createUser}, NULL,
-                #{updateUser}, #{transactionTime})
+                #{updateUser}, #{transactionTime}, #{userId})
     </insert>
 
     <update id="update" parameterType="com.crater.accounting.bean.database.TransactionPojo">
@@ -19,6 +19,7 @@
             <if test="updateTime != null">UPDATE_TIME = #{updateTime},</if>
             <if test="updateUser != null">UPDATE_USER = #{updateUser},</if>
             <if test="transactionTime != null">TRANSACTION_TIME = #{transactionTime},</if>
+            <if test="userId != null">USER_ID = #{userId},</if>
         </set>
         WHERE SER_NO = #{serNo}
     </update>
@@ -39,6 +40,7 @@
             <if test="updateUser != null">AND UPDATE_USER = #{updateUser}</if>
             <if test="queryTransactionStartTime != null">AND TRANSACTION_TIME >= #{queryTransactionStartTime}</if>
             <if test="queryTransactionEndTime != null">AND TRANSACTION_TIME &lt;= #{queryTransactionEndTime}</if>
+            <if test="userId != null">AND USER_ID = #{userId}</if>
         </where>
     </select>
 
@@ -52,6 +54,7 @@
         <result property="updateTime" column="UPDATE_TIME"/>
         <result property="updateUser" column="UPDATE_USER"/>
         <result property="transactionTime" column="TRANSACTION_TIME"/>
+        <result property="userId" column="USER_ID"/>
     </resultMap>
 
     <delete id="delete" parameterType="com.crater.accounting.bean.database.TransactionPojo">
