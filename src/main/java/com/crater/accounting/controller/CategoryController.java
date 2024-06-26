@@ -89,6 +89,9 @@ public class CategoryController {
     }
 
     private void validateRequest(UpdateGetCategoryRequest updateGetCategoryRequest, String userId) {
+        if (updateGetCategoryRequest == null) {
+            throw new RequestFormatException("updateGetCategoryRequest is cant be null");
+        }
         var errorMessage = new ArrayList<>();
         if (updateGetCategoryRequest.serialNo() == null) {
             errorMessage.add("serialNo cant be null!");
@@ -136,13 +139,28 @@ public class CategoryController {
 
     @Operation(summary = "取得消費類別細節", description = "取得消費類別細節")
     @GetMapping("/categoryController/category")
-    public GetCategoryResponse getCategoryBySerialNo(@RequestParam("serialNo") String serialNo) {
+    public GetCategoryResponse getCategoryBySerialNo(@RequestParam("serialNo") String serialNo,
+                                                     @RequestHeader("User-ID") String userId) {
         try {
+            validateGetCategoryBySerialNo(serialNo, userId);
             var queryCategoryResultDto = categoryService.queryCategory(Integer.parseInt(serialNo));
             return generateGetCategoryResponse(queryCategoryResultDto);
         } catch (Exception e) {
             log.error(ExceptionUtils.getStackTrace(e));
             throw e;
+        }
+    }
+
+    private void validateGetCategoryBySerialNo(String serialNo, String userId) {
+        var errorMessage = new ArrayList<>();
+        if (StringUtils.isBlank(serialNo)) {
+            errorMessage.add("serialNo cant be blank!");
+        }
+        if (StringUtils.isBlank(userId)) {
+            errorMessage.add("User-ID cant be blank!");
+        }
+        if (!errorMessage.isEmpty()) {
+            throw new RequestFormatException(StringUtils.join(errorMessage, "\n"));
         }
     }
 
@@ -162,8 +180,11 @@ public class CategoryController {
 
     @Operation(summary = "delete category", description = "delete category")
     @DeleteMapping("/categoryController/category")
-    public DeleteCategoryResponse deleteCategory(@RequestParam("serialNo") int serialNo) {
+    public DeleteCategoryResponse deleteCategory(@RequestParam("serialNo") Integer serialNo) {
         try {
+            if (serialNo == null) {
+                throw new RequestFormatException("serialNo cant be null!");
+            }
             categoryService.deleteCategory(serialNo);
             return new DeleteCategoryResponse(Status.generateSuccessStatus());
         } catch (Exception e) {
