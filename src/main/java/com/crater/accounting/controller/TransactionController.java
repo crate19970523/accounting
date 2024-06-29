@@ -94,12 +94,11 @@ public class TransactionController {
         }
     }
 
-    private GetTransactionDto generateQueryTransactionDto(Integer serialNo, Integer categorySerNo,
-                                                          String name, String startDate, String endDate) {
+    private GetTransactionDto generateQueryTransactionDto(Integer serialNo, Integer categorySerNo, String name,
+                                                          String startDate, String endDate, String userId) {
         var startDateForDto = startDate == null ? null : LocalDate.parse(startDate, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
         var endDateForDto = endDate == null ? null : LocalDate.parse(endDate, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-        return new GetTransactionDto(serialNo, categorySerNo, name, startDateForDto,
-                endDateForDto);
+        return new GetTransactionDto(serialNo, categorySerNo, name, startDateForDto, endDateForDto, userId);
     }
 
     private GetTransactionResponse generateGetTransactionResponse(List<GetTransactionResultDto> getTransactionResultDtos) {

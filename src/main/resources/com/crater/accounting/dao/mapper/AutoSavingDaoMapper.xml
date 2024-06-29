@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.crater.accounting.dao.mapper.AutoSavingDaoMapper">
+    <select id="select" parameterType="com.crater.accounting.bean.database.AutoSavingPojo"
+            resultMap="autoSavingPojoResultMap">
+        SELECT *
+        FROM AUTO_SAVING
+        <where>
+            <if test="serialNo != null">AND SER_NO = #{serialNo}</if>
+            <if test="categorySerialNo != null">AND CONSUMPTION_CATEGORY_SER_NO = #{categorySerialNo}</if>
+            <if test="autoSavingDate != null">AND AUTO_SAVING_DATE = #{autoSavingDate}</if>
+            <if test="autoSavingAmount != null">AND AUTO_SAVING_AMOUNT = #{autoSavingAmount}</if>
+            <if test="createTime != null">AND CREATE_TIME = #{createTime}</if>
+            <if test="createUser != null">AND CREATE_USER = #{createUser}</if>
+            <if test="updateTime != null">AND UPDATE_TIME = #{updateTime}</if>
+            <if test="updateUser != null">AND UPDATE_USER = #{updateUser}</if>
+            <if test="userId != null">AND USER_ID = #{userId}</if>
+        </where>
+    </select>
+
+    <resultMap id="autoSavingPojoResultMap" type="com.crater.accounting.bean.database.AutoSavingPojo">
+        <id property="serialNo" column="SER_NO"/>
+        <result property="categorySerialNo" column="CONSUMPTION_CATEGORY_SER_NO"/>
+        <result property="autoSavingDate" column="AUTO_SAVING_DATE"/>
+        <result property="autoSavingAmount" column="AUTO_SAVING_AMOUNT"/>
+        <result property="createTime" column="CREATE_TIME"/>
+        <result property="createUser" column="CREATE_USER"/>
+        <result property="updateTime" column="UPDATE_TIME"/>
+        <result property="updateUser" column="UPDATE_USER"/>
+        <result property="userId" column="USER_ID"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.crater.accounting.bean.database.AutoSavingPojo">
+        INSERT INTO AUTO_SAVING(CONSUMPTION_CATEGORY_SER_NO, AUTO_SAVING_DATE, AUTO_SAVING_AMOUNT, CREATE_TIME,
+                                CREATE_USER, UPDATE_TIME, UPDATE_USER, USER_ID)
+        VALUES (#{categorySerialNo}, #{autoSavingDate}, #{autoSavingAmount}, #{createTime}, #{createUser},
+                #{updateTime}, #{updateUser}, #{userId})
+    </insert>
+
+    <update id="update" parameterType="com.crater.accounting.bean.database.AutoSavingPojo">
+        UPDATE AUTO_SAVING
+        <set>
+            <if test="categorySerialNo != null">CONSUMPTION_CATEGORY_SER_NO = #{categorySerialNo},</if>
+            <if test="autoSavingDate != null">AUTO_SAVING_DATE = #{autoSavingDate},</if>
+            <if test="autoSavingAmount != null">AUTO_SAVING_AMOUNT = #{autoSavingAmount},</if>
+            <if test="createTime != null">CREATE_TIME = #{createTime},</if>
+            <if test="createUser != null">CREATE_USER = #{createUser},</if>
+            <if test="updateTime != null">UPDATE_TIME = #{updateTime},</if>
+            <if test="updateUser != null">UPDATE_USER = #{updateUser},</if>
+            <if test="userId != null">USER_ID = #{userId},</if>
+        </set>
+    </update>
+
+    <delete id="delete" parameterType="com.crater.accounting.bean.database.AutoSavingPojo">
+        DELETE FROM AUTO_SAVING
+        <where>
+            <if test="serialNo != null">AND SER_NO = #{serialNo}</if>
+            <if test="categorySerialNo != null">AND CONSUMPTION_CATEGORY_SER_NO = #{categorySerialNo}</if>
+            <if test="autoSavingDate != null">AND AUTO_SAVING_DATE = #{autoSavingDate}</if>
+            <if test="autoSavingAmount != null">AND AUTO_SAVING_AMOUNT = #{autoSavingAmount}</if>
+            <if test="createTime != null">AND CREATE_TIME = #{createTime}</if>
+            <if test="createUser != null">AND CREATE_USER = #{createUser}</if>
+            <if test="updateTime != null">AND UPDATE_TIME = #{updateTime}</if>
+            <if test="updateUser != null">AND UPDATE_USER = #{updateUser}</if>
+            <if test="userId != null">AND USER_ID = #{userId}</if>
+        </where>
+    </delete>
+</mapper>
