@@ -8,7 +8,9 @@ import com.crater.accounting.bean.service.transactionService.AddTransactionDto;
 import com.crater.accounting.bean.service.transactionService.GetTransactionDto;
 import com.crater.accounting.bean.service.transactionService.GetTransactionResultDto;
 import com.crater.accounting.bean.service.transactionService.UpdateTransactionDto;
+import com.crater.accounting.exception.RequestFormatException;
 import com.crater.accounting.service.TransactionService;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +33,7 @@ public class TransactionController {
     public AddNewTransactionResponse addNewTransaction(@RequestBody AddNewTransactionRequest request,
                                                        @RequestHeader(name = "User-ID") String userId) {
         try {
-            validateRequest(request);
+            validateRequest(request, userId);
             var addNewTransactionDto = generateAddNewTransactionDto(request, userId);
             transactionService.addTransaction(addNewTransactionDto);
             return new AddNewTransactionResponse(Status.generateSuccessStatus());
@@ -41,7 +43,10 @@ public class TransactionController {
         }
     }
 
-    private void validateRequest(AddNewTransactionRequest request) {
+    private void validateRequest(AddNewTransactionRequest request, String userId) {
+        if (request == null) {
+            throw new RequestFormatException("AddNewTransactionRequest is cant be null");
+        }
         var errorMessage = new ArrayList<String>();
         if (request.categorySerialNo() == null) {
             errorMessage.add("Category serial number is required");
@@ -52,8 +57,11 @@ public class TransactionController {
         if (request.amount() == null) {
             errorMessage.add("Amount is required");
         }
+        if (StringUtils.isBlank(userId)) {
+            errorMessage.add("User ID is required");
+        }
         if (!errorMessage.isEmpty()) {
-            throw new IllegalArgumentException(String.join(", ", errorMessage));
+            throw new RequestFormatException(String.join("\n", errorMessage));
         }
     }
 
@@ -64,19 +72,25 @@ public class TransactionController {
 
     @GetMapping("transactionController/transaction")
     public GetTransactionResponse getTransaction(@RequestHeader(name = "User-ID") String userId,
-                                                @RequestParam(value = "serialNo", required = false) Integer serialNo,
+                                                 @RequestParam(value = "serialNo", required = false) Integer serialNo,
                                                  @RequestParam(value = "categorySerNo", required = false) Integer categorySerNo,
                                                  @RequestParam(value = "name", required = false) String name,
                                                  @RequestParam(value = "startDate", required = false) String startDate,
                                                  @RequestParam(value = "endDate", required = false) String endDate) {
         try {
-            var queryTransactionDto = generateQueryTransactionDto(serialNo, categorySerNo, name, startDate, endDate,
-                    userId);
+            validateRequest(userId);
+            var queryTransactionDto = generateQueryTransactionDto(serialNo, categorySerNo, name, startDate, endDate);
             var queryTransactionResultDto = transactionService.getTransaction(queryTransactionDto);
             return generateGetTransactionResponse(queryTransactionResultDto);
         } catch (Exception e) {
             log.error(ExceptionUtils.getStackTrace(e));
             throw e;
+        }
+    }
+
+    public void validateRequest(String userId) throws RequestFormatException {
+        if (StringUtils.isBlank(userId)) {
+            throw new RequestFormatException("User ID is required");
         }
     }
 
@@ -95,13 +109,28 @@ public class TransactionController {
     }
 
     @DeleteMapping("transactionController/transaction")
-    public DeleteTransactionResponse deleteTransaction(@RequestParam("transactionSerialNo") int transactionSerialNo) {
+    public DeleteTransactionResponse deleteTransaction(@RequestHeader(name = "User-ID") String userId,
+                                                       @RequestParam("transactionSerialNo") Integer transactionSerialNo) {
         try {
+            validateRequest(userId, transactionSerialNo);
             transactionService.deleteTransaction(transactionSerialNo);
             return new DeleteTransactionResponse(Status.generateSuccessStatus());
         } catch (Exception e) {
             log.error(ExceptionUtils.getStackTrace(e));
             throw e;
+        }
+    }
+
+    private void validateRequest(String userId, Integer transactionSerialNo) throws RequestFormatException {
+        var errorMessage = new ArrayList<String>();
+        if (transactionSerialNo == null) {
+            errorMessage.add("Transaction serial number is required");
+        }
+        if (StringUtils.isBlank(userId)) {
+            errorMessage.add("User ID is required");
+        }
+        if (!errorMessage.isEmpty()) {
+            throw new RequestFormatException(String.join("\n", errorMessage));
         }
     }
 
@@ -120,12 +149,15 @@ public class TransactionController {
     }
 
     private void validateRequest(UpdateTransactionRequest request) {
+        if (request == null) {
+            throw new RequestFormatException("UpdateTransactionRequest is cant be null");
+        }
         var errorMessage = new ArrayList<String>();
         if (request.serialNo() == null) {
             errorMessage.add("Serial number is required");
         }
         if (!errorMessage.isEmpty()) {
-            throw new IllegalArgumentException(String.join(", ", errorMessage));
+            throw new RequestFormatException(String.join(", ", errorMessage));
         }
     }
 
