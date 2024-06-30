@@ -35,11 +35,11 @@ public class CategoryController {
     @PostMapping("/categoryController/addNew")
     @Operation(summary = "add new category", description = "insert new category")
     public AddNewCategoryResponse addNewCategory(@RequestBody AddNewCategoryRequest addNewCategoryRequest,
-                                                 @Schema(description = "user id, 將來會使用 Authorization 取代")
-                                                 @NotNull @RequestHeader(name = "User-ID") String userId) {
+                                                 @Schema(description = "authorization id, 將來會使用 Authorization 取代")
+                                                 @NotNull @RequestHeader(name = "Authorization") String authorization) {
         try {
-            validateRequest(addNewCategoryRequest, userId);
-            var addNewCategoryDto = generateAddNewCategoryDto(addNewCategoryRequest, userId);
+            validateRequest(addNewCategoryRequest);
+            var addNewCategoryDto = generateAddNewCategoryDto(addNewCategoryRequest, authorization);
             categoryService.addCategory(addNewCategoryDto);
             return new AddNewCategoryResponse(Status.generateSuccessStatus());
         } catch (Exception e) {
@@ -48,16 +48,13 @@ public class CategoryController {
         }
     }
 
-    private void validateRequest(AddNewCategoryRequest addNewCategoryRequest, String userId) {
+    private void validateRequest(AddNewCategoryRequest addNewCategoryRequest) {
         var errorMessage = new ArrayList<>();
         if (addNewCategoryRequest == null) {
             throw new RequestFormatException("addNewCategoryRequest is cant be null");
         }
         if (StringUtils.isBlank(addNewCategoryRequest.name())) {
             errorMessage.add("name cant be blank!");
-        }
-        if (StringUtils.isBlank(userId)) {
-            errorMessage.add("User-ID cant be blank!");
         }
         if (addNewCategoryRequest.isActive() == null) {
             errorMessage.add("active cant be null");
@@ -67,19 +64,19 @@ public class CategoryController {
         }
     }
 
-    private AddNewCategoryDto generateAddNewCategoryDto(AddNewCategoryRequest addNewCategoryRequest, String userId) {
-        return new AddNewCategoryDto(addNewCategoryRequest.name(), userId, addNewCategoryRequest.isForSaving(),
+    private AddNewCategoryDto generateAddNewCategoryDto(AddNewCategoryRequest addNewCategoryRequest, String authorization) {
+        return new AddNewCategoryDto(addNewCategoryRequest.name(), authorization, addNewCategoryRequest.isForSaving(),
                 addNewCategoryRequest.isActive());
     }
 
     @Operation(summary = "update category", description = "update category data")
     @PutMapping("/categoryController/category")
     public UpdateCategoryResponse updateCategory(@RequestBody UpdateGetCategoryRequest updateGetCategoryRequest,
-                                                 @Schema(description = "user id, 將來會使用 Authorization 取代")
-                                                 @NotNull @RequestHeader("User-ID") String userId) {
+                                                 @Schema(description = "authorization id, 將來會使用 Authorization 取代")
+                                                 @NotNull @RequestHeader("Authorization") String authorization) {
         try {
-            validateRequest(updateGetCategoryRequest, userId);
-            var updateCatalogDto = generateUpdateCatalogDto(updateGetCategoryRequest, userId);
+            validateRequest(updateGetCategoryRequest);
+            var updateCatalogDto = generateUpdateCatalogDto(updateGetCategoryRequest, authorization);
             categoryService.updateCategory(updateCatalogDto);
             return new UpdateCategoryResponse(Status.generateSuccessStatus());
         } catch (Exception e) {
@@ -88,7 +85,7 @@ public class CategoryController {
         }
     }
 
-    private void validateRequest(UpdateGetCategoryRequest updateGetCategoryRequest, String userId) {
+    private void validateRequest(UpdateGetCategoryRequest updateGetCategoryRequest) {
         if (updateGetCategoryRequest == null) {
             throw new RequestFormatException("updateGetCategoryRequest is cant be null");
         }
@@ -96,24 +93,21 @@ public class CategoryController {
         if (updateGetCategoryRequest.serialNo() == null) {
             errorMessage.add("serialNo cant be null!");
         }
-        if (StringUtils.isBlank(userId)) {
-            errorMessage.add("User-ID cant be blank!");
-        }
         if (!errorMessage.isEmpty()) {
             throw new RequestFormatException(StringUtils.join(errorMessage, "\n"));
         }
     }
 
-    private UpdateCategoryDto generateUpdateCatalogDto(UpdateGetCategoryRequest updateGetCategoryRequest, String userId) {
+    private UpdateCategoryDto generateUpdateCatalogDto(UpdateGetCategoryRequest updateGetCategoryRequest, String authorization) {
         return new UpdateCategoryDto(updateGetCategoryRequest.serialNo(), updateGetCategoryRequest.name(),
-                updateGetCategoryRequest.isForSaving(), userId, updateGetCategoryRequest.isActive());
+                updateGetCategoryRequest.isForSaving(), authorization, updateGetCategoryRequest.isActive());
     }
 
     @Operation(summary = "get category 目錄", description = "取得消費類型目錄")
     @GetMapping("/categoryController/categoryIndex")
-    public GetCategoryIndexResponse getCategoryIndex(@RequestParam(value = "name", required = false) String name) {
+    public GetCategoryIndexResponse getCategoryIndex(@RequestHeader("Authorization") String authorization) {
         try {
-            var queryCategoryDto = new QueryCategoryDto(null, name);
+            var queryCategoryDto = new QueryCategoryDto(null, null, authorization);
             var queryCategoryResultDto = categoryService.queryCategoriesIndex(queryCategoryDto);
             return generateGetCategoryIndexResponse(queryCategoryResultDto);
         } catch (Exception e) {
@@ -140,9 +134,9 @@ public class CategoryController {
     @Operation(summary = "取得消費類別細節", description = "取得消費類別細節")
     @GetMapping("/categoryController/category")
     public GetCategoryResponse getCategoryBySerialNo(@RequestParam("serialNo") String serialNo,
-                                                     @RequestHeader("User-ID") String userId) {
+                                                     @RequestHeader("Authorization") String authorization) {
         try {
-            validateGetCategoryBySerialNo(serialNo, userId);
+            validateGetCategoryBySerialNo(serialNo);
             var queryCategoryResultDto = categoryService.queryCategory(Integer.parseInt(serialNo));
             return generateGetCategoryResponse(queryCategoryResultDto);
         } catch (Exception e) {
@@ -151,13 +145,10 @@ public class CategoryController {
         }
     }
 
-    private void validateGetCategoryBySerialNo(String serialNo, String userId) {
+    private void validateGetCategoryBySerialNo(String serialNo) {
         var errorMessage = new ArrayList<>();
         if (StringUtils.isBlank(serialNo)) {
             errorMessage.add("serialNo cant be blank!");
-        }
-        if (StringUtils.isBlank(userId)) {
-            errorMessage.add("User-ID cant be blank!");
         }
         if (!errorMessage.isEmpty()) {
             throw new RequestFormatException(StringUtils.join(errorMessage, "\n"));

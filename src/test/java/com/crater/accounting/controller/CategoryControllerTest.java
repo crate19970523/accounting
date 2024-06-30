@@ -42,7 +42,6 @@ public class CategoryControllerTest {
                         null));
         assertEquals("""
                 name cant be blank!
-                User-ID cant be blank!
                 active cant be null""", exception.getMessage());
     }
 
@@ -54,7 +53,7 @@ public class CategoryControllerTest {
             assertEquals("test", dto.name());
             assertFalse(dto.isForSaving());
             assertTrue(dto.isActive());
-            assertEquals("test", dto.userId());
+            assertEquals("test", dto.authorization());
             return null;
         }).when(categoryService).addCategory(Mockito.any());
         testTarget.addNewCategory(addNewCategoryRequest, "test");
@@ -73,8 +72,7 @@ public class CategoryControllerTest {
                 testTarget.updateCategory(new UpdateGetCategoryRequest(null, null, null, null),
                         null));
         assertEquals("""
-                serialNo cant be null!
-                User-ID cant be blank!""", exception.getMessage());
+                serialNo cant be null!""", exception.getMessage());
     }
 
     @Test
@@ -86,7 +84,7 @@ public class CategoryControllerTest {
             assertEquals("test", dto.name());
             assertFalse(dto.isForSaving());
             assertTrue(dto.isActive());
-            assertEquals("test", dto.user());
+            assertEquals("test", dto.authorization());
             return null;
         }).when(categoryService).updateCategory(Mockito.any());
         testTarget.updateCategory(updateGetCategoryRequest, "test");
@@ -97,8 +95,7 @@ public class CategoryControllerTest {
         var exception = assertThrows(RequestFormatException.class, () ->
                 testTarget.getCategoryBySerialNo(null, null));
         assertEquals("""
-                serialNo cant be blank!
-                User-ID cant be blank!""", exception.getMessage());
+                serialNo cant be blank!""", exception.getMessage());
     }
 
     @Test

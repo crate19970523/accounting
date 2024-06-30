@@ -10,7 +10,6 @@ import com.crater.accounting.bean.service.transactionService.GetTransactionResul
 import com.crater.accounting.bean.service.transactionService.UpdateTransactionDto;
 import com.crater.accounting.exception.RequestFormatException;
 import com.crater.accounting.service.TransactionService;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,10 +30,10 @@ public class TransactionController {
 
     @PostMapping("transactionController/AddNew")
     public AddNewTransactionResponse addNewTransaction(@RequestBody AddNewTransactionRequest request,
-                                                       @RequestHeader(name = "User-ID") String userId) {
+                                                       @RequestHeader(name = "Authorization") String authorization) {
         try {
-            validateRequest(request, userId);
-            var addNewTransactionDto = generateAddNewTransactionDto(request, userId);
+            validateRequest(request);
+            var addNewTransactionDto = generateAddNewTransactionDto(request, authorization);
             transactionService.addTransaction(addNewTransactionDto);
             return new AddNewTransactionResponse(Status.generateSuccessStatus());
         } catch (Exception e) {
@@ -43,7 +42,7 @@ public class TransactionController {
         }
     }
 
-    private void validateRequest(AddNewTransactionRequest request, String userId) {
+    private void validateRequest(AddNewTransactionRequest request) {
         if (request == null) {
             throw new RequestFormatException("AddNewTransactionRequest is cant be null");
         }
@@ -57,29 +56,25 @@ public class TransactionController {
         if (request.amount() == null) {
             errorMessage.add("Amount is required");
         }
-        if (StringUtils.isBlank(userId)) {
-            errorMessage.add("User ID is required");
-        }
         if (!errorMessage.isEmpty()) {
             throw new RequestFormatException(String.join("\n", errorMessage));
         }
     }
 
-    private AddTransactionDto generateAddNewTransactionDto(AddNewTransactionRequest request, String userId) {
+    private AddTransactionDto generateAddNewTransactionDto(AddNewTransactionRequest request, String authorization) {
         return new AddTransactionDto(request.categorySerialNo(), request.name(), request.amount(),
-                LocalDateTime.parse(request.transactionTime(), DateTimeFormatter.ISO_LOCAL_DATE_TIME), userId);
+                LocalDateTime.parse(request.transactionTime(), DateTimeFormatter.ISO_LOCAL_DATE_TIME), authorization);
     }
 
     @GetMapping("transactionController/transaction")
-    public GetTransactionResponse getTransaction(@RequestHeader(name = "User-ID") String userId,
+    public GetTransactionResponse getTransaction(@RequestHeader(name = "Authorization") String authorization,
                                                  @RequestParam(value = "serialNo", required = false) Integer serialNo,
                                                  @RequestParam(value = "categorySerNo", required = false) Integer categorySerNo,
                                                  @RequestParam(value = "name", required = false) String name,
                                                  @RequestParam(value = "startDate", required = false) String startDate,
                                                  @RequestParam(value = "endDate", required = false) String endDate) {
         try {
-            validateRequest(userId);
-            var queryTransactionDto = generateQueryTransactionDto(serialNo, categorySerNo, name, startDate, endDate);
+            var queryTransactionDto = generateQueryTransactionDto(serialNo, categorySerNo, name, startDate, endDate, authorization);
             var queryTransactionResultDto = transactionService.getTransaction(queryTransactionDto);
             return generateGetTransactionResponse(queryTransactionResultDto);
         } catch (Exception e) {
@@ -88,17 +83,11 @@ public class TransactionController {
         }
     }
 
-    public void validateRequest(String userId) throws RequestFormatException {
-        if (StringUtils.isBlank(userId)) {
-            throw new RequestFormatException("User ID is required");
-        }
-    }
-
     private GetTransactionDto generateQueryTransactionDto(Integer serialNo, Integer categorySerNo, String name,
-                                                          String startDate, String endDate, String userId) {
+                                                          String startDate, String endDate, String authorization) {
         var startDateForDto = startDate == null ? null : LocalDate.parse(startDate, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
         var endDateForDto = endDate == null ? null : LocalDate.parse(endDate, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-        return new GetTransactionDto(serialNo, categorySerNo, name, startDateForDto, endDateForDto, userId);
+        return new GetTransactionDto(serialNo, categorySerNo, name, startDateForDto, endDateForDto, authorization);
     }
 
     private GetTransactionResponse generateGetTransactionResponse(List<GetTransactionResultDto> getTransactionResultDtos) {
@@ -109,10 +98,10 @@ public class TransactionController {
     }
 
     @DeleteMapping("transactionController/transaction")
-    public DeleteTransactionResponse deleteTransaction(@RequestHeader(name = "User-ID") String userId,
+    public DeleteTransactionResponse deleteTransaction(@RequestHeader(name = "Authorization") String authorization,
                                                        @RequestParam("transactionSerialNo") Integer transactionSerialNo) {
         try {
-            validateRequest(userId, transactionSerialNo);
+            validateRequest(transactionSerialNo);
             transactionService.deleteTransaction(transactionSerialNo);
             return new DeleteTransactionResponse(Status.generateSuccessStatus());
         } catch (Exception e) {
@@ -121,13 +110,10 @@ public class TransactionController {
         }
     }
 
-    private void validateRequest(String userId, Integer transactionSerialNo) throws RequestFormatException {
+    private void validateRequest(Integer transactionSerialNo) throws RequestFormatException {
         var errorMessage = new ArrayList<String>();
         if (transactionSerialNo == null) {
             errorMessage.add("Transaction serial number is required");
-        }
-        if (StringUtils.isBlank(userId)) {
-            errorMessage.add("User ID is required");
         }
         if (!errorMessage.isEmpty()) {
             throw new RequestFormatException(String.join("\n", errorMessage));
@@ -136,10 +122,10 @@ public class TransactionController {
 
     @PutMapping("transactionController/transaction")
     public UpdateTransactionResponse updateTransaction(@RequestBody UpdateTransactionRequest request,
-                                                       @RequestHeader("User-ID") String userId) {
+                                                       @RequestHeader("Authorization") String authorization) {
         try {
             validateRequest(request);
-            var updateTransactionDto = generateUpdateTransactionDto(request, userId);
+            var updateTransactionDto = generateUpdateTransactionDto(request, authorization);
             transactionService.updateTransaction(updateTransactionDto);
             return new UpdateTransactionResponse(Status.generateSuccessStatus());
         } catch (Exception e) {
@@ -161,9 +147,9 @@ public class TransactionController {
         }
     }
 
-    private UpdateTransactionDto generateUpdateTransactionDto(UpdateTransactionRequest request, String userId) {
+    private UpdateTransactionDto generateUpdateTransactionDto(UpdateTransactionRequest request, String authorization) {
         return new UpdateTransactionDto(request.serialNo(), request.categorySerialNo(), request.name(), request.amount(),
-                userId, request.transactionTime());
+                authorization, request.transactionTime());
     }
 
     @Autowired

@@ -8,6 +8,7 @@ import com.crater.accounting.bean.service.transactionService.UpdateTransactionDt
 import com.crater.accounting.dao.TransactionDao;
 import com.crater.accounting.exception.DbException;
 import com.crater.accounting.service.TransactionService;
+import com.crater.accounting.urils.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,9 +30,10 @@ public class TransactionServiceImpl implements TransactionService {
 
     private TransactionPojo generateAddTransactionPojo(AddTransactionDto addTransactionDto) {
         return new TransactionPojo(null, addTransactionDto.categorySerialNo(), addTransactionDto.name(),
-                addTransactionDto.amount(), LocalDateTime.now(), addTransactionDto.userId(), null,
+                addTransactionDto.amount(), LocalDateTime.now(),
+                TokenUtils.getUserFromAuthorization(addTransactionDto.authorization()), null,
                 null, addTransactionDto.transactionTime(), null, null,
-                addTransactionDto.userId());
+                TokenUtils.getUserFromAuthorization(addTransactionDto.authorization()));
     }
 
     private void callDaoToInsertTransaction(TransactionPojo transactionPojo) {
@@ -66,7 +68,8 @@ public class TransactionServiceImpl implements TransactionService {
         var endDateForQueryPojo = transactionDto.queryEndDate() == null ? null : transactionDto.queryEndDate().atTime(23, 59, 59);
         return new TransactionPojo(transactionDto.serNo(), transactionDto.consumptionCategorySerNo(), transactionDto.name(),
                 null, null, null, null, null,
-                null, startDateForQueryPojo, endDateForQueryPojo, transactionDto.userId());
+                null, startDateForQueryPojo, endDateForQueryPojo,
+                TokenUtils.getUserFromAuthorization(transactionDto.authorization()));
     }
 
     private List<TransactionPojo> callDaoToQueryTransaction(TransactionPojo transactionPojo) {
@@ -93,8 +96,8 @@ public class TransactionServiceImpl implements TransactionService {
     private TransactionPojo generateUpdateTransactionPojo(UpdateTransactionDto updateTransactionDto) {
         return new TransactionPojo(updateTransactionDto.serialNo(), updateTransactionDto.categorySerialNo(),
                 updateTransactionDto.name(), updateTransactionDto.amount(), null, null,
-                LocalDateTime.now(), updateTransactionDto.userId(),updateTransactionDto.transactionTime(),
-                null, null, updateTransactionDto.userId());
+                LocalDateTime.now(), TokenUtils.getUserFromAuthorization(updateTransactionDto.authorization()), updateTransactionDto.transactionTime(),
+                null, null, TokenUtils.getUserFromAuthorization(updateTransactionDto.authorization()));
     }
 
     private void callDaoToUpdateTransaction(TransactionPojo transactionPojo) {

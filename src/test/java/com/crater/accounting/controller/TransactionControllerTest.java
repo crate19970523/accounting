@@ -45,8 +45,7 @@ public class TransactionControllerTest {
         assertEquals("""
                 Category serial number is required
                 Name is required
-                Amount is required
-                User ID is required""", exception.getMessage());
+                Amount is required""", exception.getMessage());
     }
 
     @Test
@@ -58,17 +57,10 @@ public class TransactionControllerTest {
             assertEquals(1, dto.categorySerialNo());
             assertEquals("Transaction 1", dto.name());
             assertEquals(new BigDecimal("100.00"), dto.amount());
-            assertEquals("user123", dto.userId());
+            assertEquals("user123", dto.authorization());
             return null;
         }).when(transactionService).addTransaction(Mockito.any());
         testTarget.addNewTransaction(request, "user123");
-    }
-
-    @Test
-    public void getTransaction_allInputNull_throwRequestFormatException() {
-        var exception = assertThrows(RequestFormatException.class, () ->
-                testTarget.getTransaction(null,null, null, null, null, null));
-        assertEquals("User ID is required", exception.getMessage());
     }
 
     @Test
@@ -98,8 +90,7 @@ public class TransactionControllerTest {
         var exception = assertThrows(RequestFormatException.class, () ->
                 testTarget.deleteTransaction(null, null));
         assertEquals("""
-                Transaction serial number is required
-                User ID is required""", exception.getMessage());
+                Transaction serial number is required""", exception.getMessage());
     }
 
     @Test
@@ -136,7 +127,7 @@ public class TransactionControllerTest {
             assertEquals(1, dto.categorySerialNo());
             assertEquals("Transaction 1", dto.name());
             assertEquals(new BigDecimal("200.00"), dto.amount());
-            assertEquals("user123", dto.userId());
+            assertEquals("user123", dto.authorization());
             assertEquals(LocalDateTime.of(2022, 1, 1, 0, 0), dto.transactionTime());
             return null;
         }).when(transactionService).updateTransaction(Mockito.any());
