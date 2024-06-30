@@ -28,7 +28,7 @@
 
     <select id="selectSerNoAndName" parameterType="com.crater.accounting.bean.database.ConsumptionCategoryPojo"
         resultMap="categoryResultMap">
-        SELECT SER_NO, NAME, COALESCE(UPDATE_TIME, CREATE_TIME) AS UPDATE_TIME
+        SELECT SER_NO, NAME, CREATE_TIME, UPDATE_TIME
         FROM CONSUMPTION_CATEGORY
         <where>
             <if test="serNo != null">AND SER_NO = #{serNo}</if>

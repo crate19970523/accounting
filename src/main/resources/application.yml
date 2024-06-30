@@ -31,3 +31,5 @@ mybatis:
 accounting:
   schedule:
     autoSaving: "0 0 1 * * ?"
+  setting:
+    token-timeout: 10
