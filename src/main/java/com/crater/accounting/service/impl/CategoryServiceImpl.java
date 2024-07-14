@@ -12,6 +12,7 @@ import com.crater.accounting.dao.TransactionDao;
 import com.crater.accounting.exception.DataNotFoundException;
 import com.crater.accounting.exception.DbException;
 import com.crater.accounting.service.CategoryService;
+import com.crater.accounting.urils.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,7 +36,8 @@ public class CategoryServiceImpl implements CategoryService {
     private ConsumptionCategoryPojo generateCategoryPojo(AddNewCategoryDto addNewCategoryDto) {
         return new ConsumptionCategoryPojo(null, addNewCategoryDto.name(), addNewCategoryDto.isForSaving(),
                 LocalDateTime.now(), takeUserNameFormAuthorization(addNewCategoryDto.authorization()),
-                null, null, addNewCategoryDto.isActive(), addNewCategoryDto.authorization());
+                null, null, addNewCategoryDto.isActive(),
+                TokenUtils.getUserFromAuthorization(addNewCategoryDto.authorization()));
     }
 
     private void callDaoToInsertCategory(ConsumptionCategoryPojo categoryPojo) {
@@ -78,7 +80,7 @@ public class CategoryServiceImpl implements CategoryService {
         return new ConsumptionCategoryPojo(updateCategoryDto.serialNo(), updateCategoryDto.name(),
                 updateCategoryDto.isForSaving(), null, null,
                 LocalDateTime.now(), takeUserNameFormAuthorization(updateCategoryDto.authorization()),
-                updateCategoryDto.isActive(), updateCategoryDto.authorization());
+                updateCategoryDto.isActive(), TokenUtils.getUserFromAuthorization(updateCategoryDto.authorization()));
     }
 
     private void callDaoToUpdateCategory(ConsumptionCategoryPojo categoryPojo) {
@@ -131,7 +133,7 @@ public class CategoryServiceImpl implements CategoryService {
     private ConsumptionCategoryPojo generateCategoryPojo(QueryCategoryDto queryCategoryDto) {
         return new ConsumptionCategoryPojo(queryCategoryDto.serialNo(), queryCategoryDto.name(), null,
                 null, null, null, null, null,
-                takeUserNameFormAuthorization(queryCategoryDto.authorization()));
+                TokenUtils.getUserFromAuthorization(queryCategoryDto.authorization()));
     }
 
     private List<ConsumptionCategoryPojo> callDaoQueryCategoriesIndex(ConsumptionCategoryPojo categoryPojo) {
