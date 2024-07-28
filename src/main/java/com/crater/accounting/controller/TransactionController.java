@@ -14,6 +14,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -30,10 +31,10 @@ public class TransactionController {
 
     @PostMapping("transactionController/AddNew")
     public AddNewTransactionResponse addNewTransaction(@RequestBody AddNewTransactionRequest request,
-                                                       @RequestHeader(name = "Authorization") String authorization) {
+                                                       Authentication auth) {
         try {
             validateRequest(request);
-            var addNewTransactionDto = generateAddNewTransactionDto(request, authorization);
+            var addNewTransactionDto = generateAddNewTransactionDto(request, auth.getName());
             transactionService.addTransaction(addNewTransactionDto);
             return new AddNewTransactionResponse(Status.generateSuccessStatus());
         } catch (Exception e) {
@@ -67,14 +68,15 @@ public class TransactionController {
     }
 
     @GetMapping("transactionController/transaction")
-    public GetTransactionResponse getTransaction(@RequestHeader(name = "Authorization") String authorization,
+    public GetTransactionResponse getTransaction(Authentication auth,
                                                  @RequestParam(value = "serialNo", required = false) Integer serialNo,
                                                  @RequestParam(value = "categorySerNo", required = false) Integer categorySerNo,
                                                  @RequestParam(value = "name", required = false) String name,
                                                  @RequestParam(value = "startDate", required = false) String startDate,
                                                  @RequestParam(value = "endDate", required = false) String endDate) {
         try {
-            var queryTransactionDto = generateQueryTransactionDto(serialNo, categorySerNo, name, startDate, endDate, authorization);
+            var queryTransactionDto = generateQueryTransactionDto(serialNo, categorySerNo, name, startDate, endDate,
+                    auth.getName());
             var queryTransactionResultDto = transactionService.getTransaction(queryTransactionDto);
             return generateGetTransactionResponse(queryTransactionResultDto);
         } catch (Exception e) {
@@ -98,8 +100,7 @@ public class TransactionController {
     }
 
     @DeleteMapping("transactionController/transaction")
-    public DeleteTransactionResponse deleteTransaction(@RequestHeader(name = "Authorization") String authorization,
-                                                       @RequestParam("transactionSerialNo") Integer transactionSerialNo) {
+    public DeleteTransactionResponse deleteTransaction(@RequestParam("transactionSerialNo") Integer transactionSerialNo) {
         try {
             validateRequest(transactionSerialNo);
             transactionService.deleteTransaction(transactionSerialNo);
@@ -122,10 +123,10 @@ public class TransactionController {
 
     @PutMapping("transactionController/transaction")
     public UpdateTransactionResponse updateTransaction(@RequestBody UpdateTransactionRequest request,
-                                                       @RequestHeader("Authorization") String authorization) {
+                                                       Authentication auth) {
         try {
             validateRequest(request);
-            var updateTransactionDto = generateUpdateTransactionDto(request, authorization);
+            var updateTransactionDto = generateUpdateTransactionDto(request, auth.getName());
             transactionService.updateTransaction(updateTransactionDto);
             return new UpdateTransactionResponse(Status.generateSuccessStatus());
         } catch (Exception e) {

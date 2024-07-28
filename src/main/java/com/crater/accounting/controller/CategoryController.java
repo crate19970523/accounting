@@ -12,14 +12,14 @@ import com.crater.accounting.exception.GenerateResponseException;
 import com.crater.accounting.exception.RequestFormatException;
 import com.crater.accounting.service.CategoryService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.constraints.NotNull;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.format.DateTimeFormatter;
@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
+@SecurityRequirement(name = "basicAuth")
 @Tag(name = "category", description = "主要處理消費類別的 CRUD")
 public class CategoryController {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
@@ -35,11 +36,10 @@ public class CategoryController {
     @PostMapping("/categoryController/addNew")
     @Operation(summary = "add new category", description = "insert new category")
     public AddNewCategoryResponse addNewCategory(@RequestBody AddNewCategoryRequest addNewCategoryRequest,
-                                                 @Schema(description = "authorization id, 將來會使用 Authorization 取代")
-                                                 @NotNull @RequestHeader(name = "Authorization") String authorization) {
+                                                 Authentication auth) {
         try {
             validateRequest(addNewCategoryRequest);
-            var addNewCategoryDto = generateAddNewCategoryDto(addNewCategoryRequest, authorization);
+            var addNewCategoryDto = generateAddNewCategoryDto(addNewCategoryRequest, auth.getName());
             categoryService.addCategory(addNewCategoryDto);
             return new AddNewCategoryResponse(Status.generateSuccessStatus());
         } catch (Exception e) {
@@ -72,11 +72,10 @@ public class CategoryController {
     @Operation(summary = "update category", description = "update category data")
     @PutMapping("/categoryController/category")
     public UpdateCategoryResponse updateCategory(@RequestBody UpdateGetCategoryRequest updateGetCategoryRequest,
-                                                 @Schema(description = "authorization id, 將來會使用 Authorization 取代")
-                                                 @NotNull @RequestHeader("Authorization") String authorization) {
+                                                 Authentication auth) {
         try {
             validateRequest(updateGetCategoryRequest);
-            var updateCatalogDto = generateUpdateCatalogDto(updateGetCategoryRequest, authorization);
+            var updateCatalogDto = generateUpdateCatalogDto(updateGetCategoryRequest, auth.getName());
             categoryService.updateCategory(updateCatalogDto);
             return new UpdateCategoryResponse(Status.generateSuccessStatus());
         } catch (Exception e) {
@@ -105,9 +104,9 @@ public class CategoryController {
 
     @Operation(summary = "get category 目錄", description = "取得消費類型目錄")
     @GetMapping("/categoryController/categoryIndex")
-    public GetCategoryIndexResponse getCategoryIndex(@RequestHeader("Authorization") String authorization) {
+    public GetCategoryIndexResponse getCategoryIndex(Authentication auth) {
         try {
-            var queryCategoryDto = new QueryCategoryDto(null, null, authorization);
+            var queryCategoryDto = new QueryCategoryDto(null, null, auth.getName());
             var queryCategoryResultDto = categoryService.queryCategoriesIndex(queryCategoryDto);
             return generateGetCategoryIndexResponse(queryCategoryResultDto);
         } catch (Exception e) {
@@ -133,8 +132,7 @@ public class CategoryController {
 
     @Operation(summary = "取得消費類別細節", description = "取得消費類別細節")
     @GetMapping("/categoryController/category")
-    public GetCategoryResponse getCategoryBySerialNo(@RequestParam("serialNo") String serialNo,
-                                                     @RequestHeader("Authorization") String authorization) {
+    public GetCategoryResponse getCategoryBySerialNo(@RequestParam("serialNo") String serialNo) {
         try {
             validateGetCategoryBySerialNo(serialNo);
             var queryCategoryResultDto = categoryService.queryCategory(Integer.parseInt(serialNo));

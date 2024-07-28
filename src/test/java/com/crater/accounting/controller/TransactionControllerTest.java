@@ -11,6 +11,7 @@ import com.crater.accounting.service.TransactionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.security.core.Authentication;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -57,23 +58,26 @@ public class TransactionControllerTest {
             assertEquals(1, dto.categorySerialNo());
             assertEquals("Transaction 1", dto.name());
             assertEquals(new BigDecimal("100.00"), dto.amount());
-            assertEquals("user123", dto.authorization());
+            assertEquals("test", dto.userId());
             return null;
         }).when(transactionService).addTransaction(Mockito.any());
-        testTarget.addNewTransaction(request, "user123");
+        var authentication = Mockito.mock(Authentication.class);
+        Mockito.when(authentication.getName()).thenReturn("test");
+        testTarget.addNewTransaction(request, authentication);
     }
 
     @Test
     public void getTransaction_success() {
         List<GetTransactionResultDto> expectedTransactions = List.of(
                 new GetTransactionResultDto(1, 1, "Transaction 1", new BigDecimal("100.00"),
-                        LocalDateTime.of(2022, 1, 1, 0, 0), "user123",
-                        LocalDateTime.of(2022, 1, 1, 0, 0), "user123",
+                        LocalDateTime.of(2022, 1, 1, 0, 0), "test",
+                        LocalDateTime.of(2022, 1, 1, 0, 0), "test",
                         LocalDateTime.of(2022, 1, 1, 0, 0))
         );
         Mockito.when(transactionService.getTransaction(Mockito.any())).thenReturn(expectedTransactions);
-
-        GetTransactionResponse response = testTarget.getTransaction("user123", null, null,
+        var authentication = Mockito.mock(Authentication.class);
+        Mockito.when(authentication.getName()).thenReturn("test");
+        GetTransactionResponse response = testTarget.getTransaction(authentication, null, null,
                 null, null, null);
         assertEquals(1, response.transactions().size());
         var firstTransaction = response.transactions().getFirst();
@@ -81,14 +85,14 @@ public class TransactionControllerTest {
         assertEquals(1, firstTransaction.categorySerialNo());
         assertEquals("Transaction 1", firstTransaction.name());
         assertEquals(new BigDecimal("100.00"), firstTransaction.amount());
-        assertEquals("user123", firstTransaction.createUserId());
-        assertEquals("user123", firstTransaction.updateUserId());
+        assertEquals("test", firstTransaction.createUserId());
+        assertEquals("test", firstTransaction.updateUserId());
     }
 
     @Test
     public void deleteTransaction_allInputNull_throwRequestFormatException() {
         var exception = assertThrows(RequestFormatException.class, () ->
-                testTarget.deleteTransaction(null, null));
+                testTarget.deleteTransaction(null));
         assertEquals("""
                 Transaction serial number is required""", exception.getMessage());
     }
@@ -100,7 +104,7 @@ public class TransactionControllerTest {
             assertEquals(1, transactionSerialNo);
             return null;
         }).when(transactionService).deleteTransaction(Mockito.anyInt());
-        testTarget.deleteTransaction("user123", 1);
+        testTarget.deleteTransaction(1);
     }
 
     @Test
@@ -127,10 +131,12 @@ public class TransactionControllerTest {
             assertEquals(1, dto.categorySerialNo());
             assertEquals("Transaction 1", dto.name());
             assertEquals(new BigDecimal("200.00"), dto.amount());
-            assertEquals("user123", dto.authorization());
+            assertEquals("test", dto.userId());
             assertEquals(LocalDateTime.of(2022, 1, 1, 0, 0), dto.transactionTime());
             return null;
         }).when(transactionService).updateTransaction(Mockito.any());
-        testTarget.updateTransaction(request, "user123");
+        var authentication = Mockito.mock(Authentication.class);
+        Mockito.when(authentication.getName()).thenReturn("test");
+        testTarget.updateTransaction(request, authentication);
     }
 }
