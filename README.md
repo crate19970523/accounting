@@ -17,7 +17,7 @@
 * [x] 使用 spring doc 建立 swagger
 * [x] 學習與導入 redis 為將來登入系統做準備
 * [x] 服務內部的登入系統(無使用 salt，預計於 spring security 加入這部分)
-* [ ] 導入 spring security
+* [x] 導入 spring security
 * [ ] 優化 swagger 顯示內容
 * [ ] 使用 jenkins 和 k8s （需要學習）
 * [ ] 使用 aws 的 domain name
