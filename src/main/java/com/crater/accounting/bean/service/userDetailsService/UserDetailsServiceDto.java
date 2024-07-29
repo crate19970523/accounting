@@ -1,4 +1,4 @@
-package com.crater.accounting.bean.service;
+package com.crater.accounting.bean.service.userDetailsService;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
