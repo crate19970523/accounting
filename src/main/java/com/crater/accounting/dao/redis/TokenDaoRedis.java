@@ -10,35 +10,35 @@ import java.util.concurrent.TimeUnit;
 
 @Component
 public class TokenDaoRedis implements TokenDao {
-    private RedisTemplate<String, TokenPojo> redisTemplate;
+    private RedisTemplate<String, TokenPojo> tokenRedisTemplate;
 
 
     @Override
     public TokenPojo getByToken(String token) {
-        return redisTemplate.opsForValue().get("token:" + token);
+        return tokenRedisTemplate.opsForValue().get("token:" + token);
     }
 
     @Override
     public TokenPojo getByUserName(String userName) {
-        return redisTemplate.opsForValue().get("userName:" + userName);
+        return tokenRedisTemplate.opsForValue().get("userName:" + userName);
     }
 
     @Override
     public void update(TokenPojo tokenPojo) {
-        var valueOps = redisTemplate.opsForValue();
+        var valueOps = tokenRedisTemplate.opsForValue();
         valueOps.set("token:" + tokenPojo.token(), tokenPojo, tokenPojo.timeout(), TimeUnit.MINUTES);
         valueOps.set("userName:" + tokenPojo.userName(), tokenPojo);
     }
 
     @Override
     public boolean exists(String token) {
-        var valueOps = redisTemplate.opsForValue();
+        var valueOps = tokenRedisTemplate.opsForValue();
         return valueOps.get("token:" + token) != null;
     }
 
     @Override
     public void deleteTokenByToken(String token) {
-        redisTemplate.delete("token:" + token);
+        tokenRedisTemplate.delete("token:" + token);
     }
 
     @Override
@@ -48,7 +48,7 @@ public class TokenDaoRedis implements TokenDao {
     }
 
     @Autowired
-    public void setRedisTemplate(RedisTemplate<String, TokenPojo> redisTemplate) {
-        this.redisTemplate = redisTemplate;
+    public void setTokenRedisTemplate(RedisTemplate<String, TokenPojo> tokenRedisTemplate) {
+        this.tokenRedisTemplate = tokenRedisTemplate;
     }
 }

@@ -12,6 +12,7 @@ import com.crater.accounting.exception.DbException;
 import com.crater.accounting.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -23,6 +24,7 @@ public class AccountServiceImpl implements AccountService {
     private UserDataDao userDataDao;
     private TokenDao tokenDao;
     private Integer tokenTimeout;
+    private PasswordEncoder passwordEncoder;
 
     @Override
     public void insertAccount(AddNewAccountDto addNewAccountDto) {
@@ -31,7 +33,8 @@ public class AccountServiceImpl implements AccountService {
     }
 
     private UserDataPojo generateAddUserPojo(AddNewAccountDto addNewAccountDto) {
-        return new UserDataPojo(addNewAccountDto.userName(), addNewAccountDto.password(), addNewAccountDto.isActive(),
+        var password = passwordEncoder.encode(addNewAccountDto.password());
+        return new UserDataPojo(addNewAccountDto.userName(), password, addNewAccountDto.isActive(),
                 LocalDateTime.now(), "add", null, null);
     }
 
@@ -45,8 +48,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public LoginResultDto login(LoginDto loginDto) throws AccountException {
-        var isUserExist = checkIsUserExist(loginDto.userName(), loginDto.password());
-        if (!isUserExist) {
+        if (!checkIsUserExist(loginDto.userName(), loginDto.password())) {
             throw new AccountException("使用者不存在或帳號密碼錯誤");
         }
         if (checkIsTokenStillActive(loginDto.userName())) {
@@ -59,7 +61,8 @@ public class AccountServiceImpl implements AccountService {
 
     private boolean checkIsUserExist(String userName, String password) {
         try {
-            return !userDataDao.select(new UserDataPojo().setUserName(userName).setPassword(password)).isEmpty();
+            return !userDataDao.select(new UserDataPojo(userName, password, true, LocalDateTime.now(), userName,
+                    LocalDateTime.now(), userName)).isEmpty();
         } catch (Exception e) {
             throw new DbException("select db to check authorization fail", e);
         }
@@ -111,6 +114,11 @@ public class AccountServiceImpl implements AccountService {
     @Autowired
     public void setTokenDao(TokenDao tokenDao) {
         this.tokenDao = tokenDao;
+    }
+
+    @Autowired
+    public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Value("${accounting.setting.token-timeout}")

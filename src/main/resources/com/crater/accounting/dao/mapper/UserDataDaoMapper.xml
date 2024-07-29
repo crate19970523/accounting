@@ -4,13 +4,13 @@
     <select id="select" parameterType="com.crater.accounting.bean.database.UserDataPojo" resultMap="userDataResultMap">
         SELECT * FROM USER_DATA
         <where>
-            <if test="userName">AND USER_NAME = #{userName}</if>
-            <if test="password">AND PASSWORD = #{password}</if>
-            <if test="isActive">AND IS_ACTIVE = #{isActive}</if>
-            <if test="createTime">AND CREATE_TIME = #{createTime}</if>
-            <if test="createUser">AND CREATE_USER = #{createUser}</if>
-            <if test="updateTime">AND UPDATE_TIME = #{updateTime}</if>
-            <if test="updateUser">AND UPDATE_USER = #{updateUser}</if>
+            <if test="userName != null">AND USER_NAME = #{userName}</if>
+            <if test="password != null">AND PASSWORD = #{password}</if>
+            <if test="isActive != null">AND IS_ACTIVE = #{isActive}</if>
+            <if test="createTime != null">AND CREATE_TIME = #{createTime}</if>
+            <if test="createUser != null">AND CREATE_USER = #{createUser}</if>
+            <if test="updateTime != null">AND UPDATE_TIME = #{updateTime}</if>
+            <if test="updateUser != null">AND UPDATE_USER = #{updateUser}</if>
         </where>
     </select>
 
@@ -32,13 +32,13 @@
     <update id="update" parameterType="com.crater.accounting.bean.database.UserDataPojo">
         UPDATE USER_DATA
         <set>
-            <if test="userName">USER_NAME = #{userName},</if>
-            <if test="password">PASSWORD = #{password},</if>
-            <if test="isActive">IS_ACTIVE = #{isActive},</if>
-            <if test="createTime">CREATE_TIME = #{createTime},</if>
-            <if test="createUser">CREATE_USER = #{createUser},</if>
-            <if test="updateTime">UPDATE_TIME = #{updateTime},</if>
-            <if test="updateUser">UPDATE_USER = #{updateUser},</if>
+            <if test="userName != null">USER_NAME = #{userName},</if>
+            <if test="password != null">PASSWORD = #{password},</if>
+            <if test="isActive != null">IS_ACTIVE = #{isActive},</if>
+            <if test="createTime != null">CREATE_TIME = #{createTime},</if>
+            <if test="createUser != null">CREATE_USER = #{createUser},</if>
+            <if test="updateTime != null">UPDATE_TIME = #{updateTime},</if>
+            <if test="updateUser != null">UPDATE_USER = #{updateUser},</if>
         </set>
         WHERE USER_NAME = #{userName}
     </update>

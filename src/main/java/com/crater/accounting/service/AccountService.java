@@ -8,5 +8,4 @@ import com.crater.accounting.exception.AccountException;
 public interface AccountService {
     void insertAccount(AddNewAccountDto addNewAccountDto);
     LoginResultDto login(LoginDto loginDto) throws AccountException;
-
 }

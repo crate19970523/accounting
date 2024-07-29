@@ -10,6 +10,7 @@ import com.crater.accounting.service.CategoryService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.security.core.Authentication;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -53,10 +54,12 @@ public class CategoryControllerTest {
             assertEquals("test", dto.name());
             assertFalse(dto.isForSaving());
             assertTrue(dto.isActive());
-            assertEquals("test", dto.authorization());
+            assertEquals("test", dto.userId());
             return null;
         }).when(categoryService).addCategory(Mockito.any());
-        testTarget.addNewCategory(addNewCategoryRequest, "test");
+        var authentication = Mockito.mock(Authentication.class);
+        Mockito.when(authentication.getName()).thenReturn("test");
+        testTarget.addNewCategory(addNewCategoryRequest, authentication);
     }
 
     @Test
@@ -84,16 +87,18 @@ public class CategoryControllerTest {
             assertEquals("test", dto.name());
             assertFalse(dto.isForSaving());
             assertTrue(dto.isActive());
-            assertEquals("test", dto.authorization());
+            assertEquals("test", dto.userId());
             return null;
         }).when(categoryService).updateCategory(Mockito.any());
-        testTarget.updateCategory(updateGetCategoryRequest, "test");
+        var authentication = Mockito.mock(Authentication.class);
+        Mockito.when(authentication.getName()).thenReturn("test");
+        testTarget.updateCategory(updateGetCategoryRequest, authentication);
     }
 
     @Test
     public void getCategoryBySerialNo_allInputNull_throwRequestFormatException() {
         var exception = assertThrows(RequestFormatException.class, () ->
-                testTarget.getCategoryBySerialNo(null, null));
+                testTarget.getCategoryBySerialNo(null));
         assertEquals("""
                 serialNo cant be blank!""", exception.getMessage());
     }
@@ -103,7 +108,7 @@ public class CategoryControllerTest {
         Mockito.when(categoryService.queryCategory(Mockito.anyInt()))
                 .thenReturn(new QueryCategoryResultDto(1, "test", LocalDateTime.now(),
                         "user", LocalDateTime.now(), "user", false, true));
-        var response = testTarget.getCategoryBySerialNo("1", "test");
+        var response = testTarget.getCategoryBySerialNo("1");
         assertEquals(1, response.categoryData().serialNo());
         assertEquals("test", response.categoryData().name());
         assertFalse(response.categoryData().isForSaving());
@@ -117,7 +122,9 @@ public class CategoryControllerTest {
                                 "user1", LocalDateTime.now(), "user1", false, true),
                         new QueryCategoryResultDto(2, "test2", LocalDateTime.now(),
                                 "user2", LocalDateTime.now(), "user2", true, false)));
-        var response = testTarget.getCategoryIndex("test");
+        var authentication = Mockito.mock(Authentication.class);
+        Mockito.when(authentication.getName()).thenReturn("test");
+        var response = testTarget.getCategoryIndex(authentication);
         assertEquals(2, response.categoryIndexData().size());
         assertEquals(1, response.categoryIndexData().get(0).serialNo());
         assertEquals("test1", response.categoryIndexData().get(0).name());

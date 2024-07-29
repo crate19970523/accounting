@@ -7,12 +7,10 @@ import com.crater.accounting.bean.service.categoryService.QueryCategoryDto;
 import com.crater.accounting.bean.service.categoryService.QueryCategoryResultDto;
 import com.crater.accounting.bean.service.categoryService.UpdateCategoryDto;
 import com.crater.accounting.dao.ConsumptionCategoryDao;
-import com.crater.accounting.dao.TokenDao;
 import com.crater.accounting.dao.TransactionDao;
 import com.crater.accounting.exception.DataNotFoundException;
 import com.crater.accounting.exception.DbException;
 import com.crater.accounting.service.CategoryService;
-import com.crater.accounting.urils.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,7 +22,6 @@ import java.util.List;
 public class CategoryServiceImpl implements CategoryService {
     private ConsumptionCategoryDao consumptionCategoryDao;
     private TransactionDao transactionDao;
-    private TokenDao tokenDao;
 
     @Override
     @Transactional
@@ -35,9 +32,9 @@ public class CategoryServiceImpl implements CategoryService {
 
     private ConsumptionCategoryPojo generateCategoryPojo(AddNewCategoryDto addNewCategoryDto) {
         return new ConsumptionCategoryPojo(null, addNewCategoryDto.name(), addNewCategoryDto.isForSaving(),
-                LocalDateTime.now(), takeUserNameFormAuthorization(addNewCategoryDto.authorization()),
+                LocalDateTime.now(), addNewCategoryDto.userId(),
                 null, null, addNewCategoryDto.isActive(),
-                TokenUtils.getUserFromAuthorization(addNewCategoryDto.authorization()));
+                addNewCategoryDto.userId());
     }
 
     private void callDaoToInsertCategory(ConsumptionCategoryPojo categoryPojo) {
@@ -79,8 +76,8 @@ public class CategoryServiceImpl implements CategoryService {
     private ConsumptionCategoryPojo generateCategoryPojo(UpdateCategoryDto updateCategoryDto) {
         return new ConsumptionCategoryPojo(updateCategoryDto.serialNo(), updateCategoryDto.name(),
                 updateCategoryDto.isForSaving(), null, null,
-                LocalDateTime.now(), takeUserNameFormAuthorization(updateCategoryDto.authorization()),
-                updateCategoryDto.isActive(), TokenUtils.getUserFromAuthorization(updateCategoryDto.authorization()));
+                LocalDateTime.now(), updateCategoryDto.userId(),
+                updateCategoryDto.isActive(), updateCategoryDto.userId());
     }
 
     private void callDaoToUpdateCategory(ConsumptionCategoryPojo categoryPojo) {
@@ -133,7 +130,7 @@ public class CategoryServiceImpl implements CategoryService {
     private ConsumptionCategoryPojo generateCategoryPojo(QueryCategoryDto queryCategoryDto) {
         return new ConsumptionCategoryPojo(queryCategoryDto.serialNo(), queryCategoryDto.name(), null,
                 null, null, null, null, null,
-                TokenUtils.getUserFromAuthorization(queryCategoryDto.authorization()));
+                queryCategoryDto.userId());
     }
 
     private List<ConsumptionCategoryPojo> callDaoQueryCategoriesIndex(ConsumptionCategoryPojo categoryPojo) {
@@ -149,10 +146,6 @@ public class CategoryServiceImpl implements CategoryService {
                 c.createUser(), c.updateTime(), c.updateUser(), c.isForSaving(), c.isActive())).toList();
     }
 
-    private String takeUserNameFormAuthorization(String authorization) {
-        return tokenDao.getByToken(authorization.split(" ")[1]).userName();
-    }
-
     @Autowired
     public void setConsumptionCategoryDao(ConsumptionCategoryDao consumptionCategoryDao) {
         this.consumptionCategoryDao = consumptionCategoryDao;
@@ -161,10 +154,5 @@ public class CategoryServiceImpl implements CategoryService {
     @Autowired
     public void setTransactionDao(TransactionDao transactionDao) {
         this.transactionDao = transactionDao;
-    }
-
-    @Autowired
-    public void setTokenDao(TokenDao tokenDao) {
-        this.tokenDao = tokenDao;
     }
 }
