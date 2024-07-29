@@ -42,7 +42,6 @@ public class ApplicationConfig {
         var providerManager = new ProviderManager(Collections.singletonList(authenticationProvider));
         return http
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("swagger-ui/**", "/swagger-ui.html", "open-api/**", "/v3/api-docs/**").permitAll()
                         .anyRequest().authenticated()
                 ).httpBasic(withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
@@ -51,7 +50,8 @@ public class ApplicationConfig {
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring().requestMatchers("/js/**", "/css/**", "/accountController/account");
+        return (web) -> web.ignoring().requestMatchers("/js/**", "/css/**", "/accountController/account",
+                "swagger-ui/**", "/swagger-ui.html", "open-api/**", "/v3/api-docs/**");
     }
 
     @Bean

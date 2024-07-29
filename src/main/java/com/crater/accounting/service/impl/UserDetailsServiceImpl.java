@@ -1,7 +1,7 @@
 package com.crater.accounting.service.impl;
 
 import com.crater.accounting.bean.database.UserDataPojo;
-import com.crater.accounting.bean.service.UserDetailsServiceDto;
+import com.crater.accounting.bean.service.userDetailsService.UserDetailsServiceDto;
 import com.crater.accounting.dao.UserDataDao;
 import com.crater.accounting.dao.UserRedisDao;
 import com.crater.accounting.exception.DbException;
