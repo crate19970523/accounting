@@ -5,4 +5,4 @@ RUN mkdir -p /opt/accounting-test/log
 USER myuser
 COPY build/libs/*.jar /opt/accounting/app/accounting.jar
 VOLUME ["/opt/accounting/conf", "/opt/accounting/log:Z"]
-ENTRYPOINT ["java","-jar","/opt/accounting/app/accounting.jar","--spring.profiles.active=test", "-Dspring.config.location=/opt/accounting/conf/application-test.yml"]
+ENTRYPOINT ["java","-jar","-Dspring.profiles.active=test", "-Dspring.config.additional-location=/opt/accounting/conf/application-test.yml", "/opt/accounting/app/accounting.jar"]
