@@ -2,7 +2,7 @@ server:
   port: 8080
   address: 0.0.0.0
   servlet:
-    context-path: /
+    context-path: /api/
 spring:
   profiles:
     active: dev
@@ -21,7 +21,7 @@ logging:
     root: info
     com:
       crater:
-        hanaengine:
+        accounting:
           dao:
             mapper: debug
 mybatis:
