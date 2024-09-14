@@ -5,6 +5,11 @@ import com.crater.accounting.bean.database.UserRedisDataPojo;
 import com.crater.accounting.security.AuthenticationProviderImpl;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Contact;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.servers.Server;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -32,6 +37,7 @@ import static org.springframework.security.config.Customizer.withDefaults;
         name = "basicAuth",
         scheme = "basic")
 public class ApplicationConfig {
+    private String contextPath;
     @Bean
     public AuthenticationProvider authenticationProvider() {
         return new AuthenticationProviderImpl();
@@ -92,6 +98,16 @@ public class ApplicationConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
-//        return NoOpPasswordEncoder.getInstance();
+    }
+
+    @Bean
+    public OpenAPI openAPI() {
+        return new OpenAPI().addServersItem(new Server().url(contextPath)).info(new Info().title("記帳！？")
+                .description("自動記帳").version("0.0.0").contact(new Contact().name("王郁翔").email("s19970523s@gmail.com")));
+    }
+
+    @Value("${server.servlet.context-path}")
+    public void setContextPath(String contextPath) {
+        this.contextPath = contextPath;
     }
 }
