@@ -33,6 +33,9 @@ public class AuthenticationProviderImpl implements AuthenticationProvider {
                 throw new AuthenticationServiceException("Username or password is missing");
             }
             var userData = userDetailsService.loadUserByUsername(username);
+            if (userData == null) {
+                throw new AuthenticationServiceException("user not found");
+            }
             if (!passwordEncoder.matches(password, userData.getPassword())) {
                 throw new AuthenticationServiceException("Invalid password");
             }
