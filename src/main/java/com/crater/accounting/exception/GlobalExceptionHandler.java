@@ -27,4 +27,9 @@ public class GlobalExceptionHandler {
     public GlobalExceptionHandlerResponse handleDataNotFoundException(DataNotFoundException e) {
         return new GlobalExceptionHandlerResponse(new Status(false, "Data not found exception", e.getMessage()));
     }
+
+    @ExceptionHandler(AccountException.class)
+    public GlobalExceptionHandlerResponse handleAccountException(AccountException e) {
+        return new GlobalExceptionHandlerResponse(new Status(false, "使用者錯誤", e.getMessage()));
+    }
 }
