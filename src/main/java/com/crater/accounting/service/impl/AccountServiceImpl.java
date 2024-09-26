@@ -1,29 +1,24 @@
 package com.crater.accounting.service.impl;
 
-import com.crater.accounting.bean.database.TokenPojo;
 import com.crater.accounting.bean.database.UserDataPojo;
 import com.crater.accounting.bean.service.account.AddNewAccountDto;
 import com.crater.accounting.bean.service.account.LoginDto;
 import com.crater.accounting.bean.service.account.LoginResultDto;
-import com.crater.accounting.dao.TokenDao;
 import com.crater.accounting.dao.UserDataDao;
 import com.crater.accounting.exception.AccountException;
 import com.crater.accounting.exception.DbException;
 import com.crater.accounting.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
+import java.util.Base64;
 
 @Service
 public class AccountServiceImpl implements AccountService {
 
     private UserDataDao userDataDao;
-    private TokenDao tokenDao;
-    private Integer tokenTimeout;
     private PasswordEncoder passwordEncoder;
 
     @Override
@@ -51,59 +46,26 @@ public class AccountServiceImpl implements AccountService {
         if (!checkIsUserExist(loginDto.userName(), loginDto.password())) {
             throw new AccountException("使用者不存在或帳號密碼錯誤");
         }
-        if (checkIsTokenStillActive(loginDto.userName())) {
-            deleteToken(loginDto.userName());
-        }
-        var token = generateToken();
-        callDaoUpdateToken(loginDto.userName(), token);
+        var token = generateToken(loginDto);
         return new LoginResultDto(token);
     }
 
     private boolean checkIsUserExist(String userName, String password) {
         try {
-            return !userDataDao.select(new UserDataPojo(userName, password, true, LocalDateTime.now(), userName,
-                    LocalDateTime.now(), userName)).isEmpty();
+            var result = false;
+            var userData = userDataDao.select(new UserDataPojo(userName, null, true, null, null, null, null));
+            if (!userData.isEmpty()) {
+                result = passwordEncoder.matches(password, userData.getFirst().password());
+            }
+            return result;
         } catch (Exception e) {
             throw new DbException("select db to check authorization fail", e);
         }
     }
 
-    private boolean checkIsTokenStillActive(String userName) {
-        try {
-            var result = false;
-            var tokenData = tokenDao.getByUserName(userName);
-            if (tokenData != null) {
-                result = (tokenDao.getByToken(tokenData.token()) != null);
-            }
-            return result;
-        } catch (Exception e) {
-            throw new DbException("check token active failed", e);
-        }
-    }
-
-    private void deleteToken(String userName) {
-        try {
-            tokenDao.deleteTokenByUserName(userName);
-        } catch (Exception e) {
-            throw new DbException("delete token failed", e);
-        }
-    }
-
-    private String generateToken() {
-        while (true) {
-            var token = UUID.randomUUID().toString();
-            if (!tokenDao.exists(token)) {
-                return token;
-            }
-        }
-    }
-
-    private void callDaoUpdateToken(String userName, String token) {
-        try {
-            tokenDao.update(new TokenPojo(userName, token, tokenTimeout));
-        } catch (Exception e) {
-            throw new DbException("update token failed", e);
-        }
+    private String generateToken(LoginDto loginDto) {
+        var encoder = Base64.getEncoder();
+        return encoder.encodeToString((loginDto.userName() + ":" + loginDto.password()).getBytes());
     }
 
     @Autowired
@@ -112,17 +74,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Autowired
-    public void setTokenDao(TokenDao tokenDao) {
-        this.tokenDao = tokenDao;
-    }
-
-    @Autowired
     public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
         this.passwordEncoder = passwordEncoder;
-    }
-
-    @Value("${accounting.setting.token-timeout}")
-    public void setTokenTimeout(Integer tokenTimeout) {
-        this.tokenTimeout = tokenTimeout;
     }
 }

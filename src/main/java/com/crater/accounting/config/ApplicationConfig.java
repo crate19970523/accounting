@@ -56,7 +56,7 @@ public class ApplicationConfig {
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring().requestMatchers("/js/**", "/css/**", "/accountController/account",
+        return (web) -> web.ignoring().requestMatchers("/js/**", "/css/**", "account/login", "/accountController/account",
                 "swagger-ui/**", "/swagger-ui.html", "open-api/**", "/v3/api-docs/**");
     }
 
