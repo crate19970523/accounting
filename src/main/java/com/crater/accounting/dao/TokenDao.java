@@ -1,6 +1,6 @@
 package com.crater.accounting.dao;
 
-import com.crater.accounting.bean.database.TokenPojo;
+import com.crater.craterlogin.bean.entity.redis.TokenPojo;
 
 public interface TokenDao {
     TokenPojo getByToken(String token);
