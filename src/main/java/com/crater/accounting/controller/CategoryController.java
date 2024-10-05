@@ -12,6 +12,7 @@ import com.crater.accounting.exception.GenerateResponseException;
 import com.crater.accounting.exception.RequestFormatException;
 import com.crater.accounting.service.CategoryService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.commons.lang3.StringUtils;
@@ -27,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@SecurityRequirement(name = "basicAuth")
+@SecurityRequirement(name = "bearer-key")
 @Tag(name = "category", description = "主要處理消費類別的 CRUD")
 public class CategoryController {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
@@ -132,7 +133,7 @@ public class CategoryController {
 
     @Operation(summary = "取得消費類別細節", description = "取得消費類別細節")
     @GetMapping("/categoryController/category")
-    public GetCategoryResponse getCategoryBySerialNo(@RequestParam("serialNo") String serialNo) {
+    public GetCategoryResponse getCategoryBySerialNo(@Schema(description = "category 編號", defaultValue = "1") @RequestParam("serialNo") String serialNo) {
         try {
             validateGetCategoryBySerialNo(serialNo);
             var queryCategoryResultDto = categoryService.queryCategory(Integer.parseInt(serialNo));
@@ -169,7 +170,7 @@ public class CategoryController {
 
     @Operation(summary = "delete category", description = "delete category")
     @DeleteMapping("/categoryController/category")
-    public DeleteCategoryResponse deleteCategory(@RequestParam("serialNo") Integer serialNo) {
+    public DeleteCategoryResponse deleteCategory(@Schema(description = "category 編號", defaultValue = "1") @RequestParam("serialNo") Integer serialNo) {
         try {
             if (serialNo == null) {
                 throw new RequestFormatException("serialNo cant be null!");

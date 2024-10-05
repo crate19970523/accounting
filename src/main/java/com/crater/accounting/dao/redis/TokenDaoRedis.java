@@ -1,7 +1,7 @@
 package com.crater.accounting.dao.redis;
 
-import com.crater.accounting.bean.database.TokenPojo;
 import com.crater.accounting.dao.TokenDao;
+import com.crater.craterlogin.bean.entity.redis.TokenPojo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
@@ -12,10 +12,9 @@ import java.util.concurrent.TimeUnit;
 public class TokenDaoRedis implements TokenDao {
     private RedisTemplate<String, TokenPojo> tokenRedisTemplate;
 
-
-    @Override
+        @Override
     public TokenPojo getByToken(String token) {
-        return tokenRedisTemplate.opsForValue().get("token:" + token);
+        return tokenRedisTemplate.opsForValue().get(token);
     }
 
     @Override
@@ -27,7 +26,7 @@ public class TokenDaoRedis implements TokenDao {
     public void update(TokenPojo tokenPojo) {
         var valueOps = tokenRedisTemplate.opsForValue();
         valueOps.set("token:" + tokenPojo.token(), tokenPojo, tokenPojo.timeout(), TimeUnit.MINUTES);
-        valueOps.set("userName:" + tokenPojo.userName(), tokenPojo);
+        valueOps.set("userName:" + tokenPojo.userId(), tokenPojo);
     }
 
     @Override

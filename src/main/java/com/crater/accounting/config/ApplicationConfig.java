@@ -1,13 +1,15 @@
 package com.crater.accounting.config;
 
-import com.crater.accounting.bean.database.TokenPojo;
 import com.crater.accounting.bean.database.UserRedisDataPojo;
-import com.crater.accounting.security.AuthenticationProviderImpl;
-import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
-import io.swagger.v3.oas.annotations.security.SecurityScheme;
+import com.crater.accounting.security.AccountingBearerTokenResolver;
+import com.crater.accounting.security.BearerTokenAuthenticationProviderImpl;
+import com.crater.craterlogin.bean.entity.redis.TokenPojo;
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -21,37 +23,37 @@ import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 import java.util.Collections;
-
-import static org.springframework.security.config.Customizer.withDefaults;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
-@SecurityScheme(
-        type = SecuritySchemeType.HTTP,
-        name = "basicAuth",
-        scheme = "basic")
 public class ApplicationConfig {
     private String contextPath;
+
     @Bean
-    public AuthenticationProvider authenticationProvider() {
-        return new AuthenticationProviderImpl();
+    public AccountingBearerTokenResolver accountingBearerTokenResolver() {
+        return new AccountingBearerTokenResolver();
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationProvider authenticationProvider) throws Exception {
-        var providerManager = new ProviderManager(Collections.singletonList(authenticationProvider));
+    public AuthenticationProvider bearerTokenAuthenticationProvider() {
+        return new BearerTokenAuthenticationProviderImpl();
+    }
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationProvider bearerTokenAuthenticationProvider,
+                                                   AccountingBearerTokenResolver accountingBearerTokenResolver) throws Exception {
+        var oauth2Manger = new ProviderManager(Collections.singletonList(bearerTokenAuthenticationProvider));
         return http
-                .authorizeHttpRequests((requests) -> requests
-                        .anyRequest().authenticated()
-                ).httpBasic(withDefaults())
-                .csrf(AbstractHttpConfigurer::disable)
-                .authenticationManager(providerManager).build();
+                .authorizeHttpRequests(authorizeRequests -> authorizeRequests.anyRequest().authenticated())
+                .oauth2ResourceServer(h ->
+                        h.bearerTokenResolver(accountingBearerTokenResolver).authenticationManagerResolver(request -> oauth2Manger))
+                .build();
     }
 
     @Bean
@@ -62,7 +64,6 @@ public class ApplicationConfig {
 
     @Bean
     public RedisTemplate<String, TokenPojo> tokenRedisTemplate(RedisConnectionFactory factory) {
-
         RedisTemplate<String, TokenPojo> template = new RedisTemplate<>();
         template.setConnectionFactory(factory);
 
@@ -81,18 +82,18 @@ public class ApplicationConfig {
     @Bean
     public RedisTemplate<String, UserRedisDataPojo> userRedisTemplate(RedisConnectionFactory factory) {
 
-        RedisTemplate<String, UserRedisDataPojo> template = new RedisTemplate<>();
-        template.setConnectionFactory(factory);
+        RedisTemplate<String, UserRedisDataPojo> userRedisTemplate = new RedisTemplate<>();
+        userRedisTemplate.setConnectionFactory(factory);
 
         GenericJackson2JsonRedisSerializer jackson2JsonRedisSerializer = new GenericJackson2JsonRedisSerializer();
         StringRedisSerializer stringRedisSerializer = new StringRedisSerializer();
 
-        template.setKeySerializer(stringRedisSerializer);
-        template.setHashKeySerializer(stringRedisSerializer);
-        template.setValueSerializer(jackson2JsonRedisSerializer);
-        template.setHashValueSerializer(jackson2JsonRedisSerializer);
-        template.afterPropertiesSet();
-        return template;
+        userRedisTemplate.setKeySerializer(stringRedisSerializer);
+        userRedisTemplate.setHashKeySerializer(stringRedisSerializer);
+        userRedisTemplate.setValueSerializer(jackson2JsonRedisSerializer);
+        userRedisTemplate.setHashValueSerializer(jackson2JsonRedisSerializer);
+        userRedisTemplate.afterPropertiesSet();
+        return userRedisTemplate;
     }
 
     @Bean
@@ -102,8 +103,21 @@ public class ApplicationConfig {
 
     @Bean
     public OpenAPI openAPI() {
-        return new OpenAPI().addServersItem(new Server().url(contextPath)).info(new Info().title("記帳！？")
-                .description("自動記帳").version("0.0.0").contact(new Contact().name("王郁翔").email("s19970523s@gmail.com")));
+        final String securitySchemeName = "bearerAuth";
+        return new OpenAPI()
+                .addServersItem(new Server().url(contextPath))
+                .components(new Components()
+                        .addSecuritySchemes("bearer-key", new SecurityScheme()
+                                .type(SecurityScheme.Type.HTTP)
+                                .scheme("bearer")
+                                .bearerFormat("token"))
+                )
+                .security(List.of(new SecurityRequirement().addList(securitySchemeName)))
+                .info(new Info()
+                        .title("記帳！？")
+                        .description("自動記帳")
+                        .version("0.0.0")
+                        .contact(new Contact().name("王郁翔").email("s19970523s@gmail.com")));
     }
 
     @Value("${server.servlet.context-path}")

@@ -10,6 +10,7 @@ import com.crater.accounting.bean.service.account.LoginDto;
 import com.crater.accounting.exception.AccountException;
 import com.crater.accounting.exception.RequestFormatException;
 import com.crater.accounting.service.AccountService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -23,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 @RestController
+@Tag(name = "AccountController", description = "即將移除，將會搬遷到 account 服務")
 public class AccountController {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 

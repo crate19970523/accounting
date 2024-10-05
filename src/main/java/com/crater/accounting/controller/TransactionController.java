@@ -10,6 +10,7 @@ import com.crater.accounting.bean.service.transactionService.GetTransactionResul
 import com.crater.accounting.bean.service.transactionService.UpdateTransactionDto;
 import com.crater.accounting.exception.RequestFormatException;
 import com.crater.accounting.service.TransactionService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +24,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+@SecurityRequirement(name = "bearer-key")
 @RestController
 public class TransactionController {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
