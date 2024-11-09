@@ -28,7 +28,7 @@
 
     <select id="selectSerNoAndName" parameterType="com.crater.accounting.bean.database.ConsumptionCategoryPojo"
         resultMap="categoryResultMap">
-        SELECT SER_NO, NAME, CREATE_TIME, UPDATE_TIME
+        SELECT SER_NO, NAME, CREATE_TIME, IS_ACTIVE, IS_FOR_SAVING, UPDATE_TIME
         FROM CONSUMPTION_CATEGORY
         <where>
             <if test="serNo != null">AND SER_NO = #{serNo}</if>
@@ -38,6 +38,7 @@
             <if test="updateTime != null">AND UPDATE_TIME = #{updateTime}</if>
             <if test="updateUser != null">AND UPDATE_USER = #{updateUser}</if>
             <if test="isActive != null">AND IS_ACTIVE = #{isActive}</if>
+            <if test="isForSaving != null">AND IS_FOR_SAVING = #{isForSaving}</if>
             <if test="userId != null">AND USER_ID = #{userId}</if>
         </where>
         ORDER BY SER_NO
