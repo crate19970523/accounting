@@ -128,8 +128,8 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     private ConsumptionCategoryPojo generateCategoryPojo(QueryCategoryDto queryCategoryDto) {
-        return new ConsumptionCategoryPojo(queryCategoryDto.serialNo(), queryCategoryDto.name(), null,
-                null, null, null, null, null,
+        return new ConsumptionCategoryPojo(queryCategoryDto.serialNo(), queryCategoryDto.name(), queryCategoryDto.isForSaving(),
+                null, null, null, null, queryCategoryDto.isActive(),
                 queryCategoryDto.userId());
     }
 

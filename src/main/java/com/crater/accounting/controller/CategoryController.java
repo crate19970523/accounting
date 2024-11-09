@@ -105,9 +105,10 @@ public class CategoryController {
 
     @Operation(summary = "get category 目錄", description = "取得消費類型目錄")
     @GetMapping("/categoryController/categoryIndex")
-    public GetCategoryIndexResponse getCategoryIndex(Authentication auth) {
+    public GetCategoryIndexResponse getCategoryIndex(Authentication auth, @RequestParam(required = false) String categoryName,
+                                                     @RequestParam(required = false) boolean isActive, @RequestParam(required = false) boolean isForSaving) {
         try {
-            var queryCategoryDto = new QueryCategoryDto(null, null, auth.getName());
+            var queryCategoryDto = new QueryCategoryDto(null, categoryName, isActive, isForSaving, auth.getName());
             var queryCategoryResultDto = categoryService.queryCategoriesIndex(queryCategoryDto);
             return generateGetCategoryIndexResponse(queryCategoryResultDto);
         } catch (Exception e) {
@@ -122,7 +123,8 @@ public class CategoryController {
                     .map(resultDto -> {
                         var updateTime = (resultDto.updateTime() == null ? resultDto.createTime() :
                                 resultDto.updateTime()).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-                        return new CategoryIndexData(resultDto.serialNo(), resultDto.name(), updateTime);
+                        return new CategoryIndexData(resultDto.serialNo(), resultDto.name(), resultDto.isForSaving(),
+                                resultDto.isActive(), updateTime);
                     })
                     .toList();
             return new GetCategoryIndexResponse(Status.generateSuccessStatus(), categoryIndexData);
