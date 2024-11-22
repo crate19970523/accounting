@@ -106,7 +106,7 @@ public class CategoryController {
     @Operation(summary = "get category 目錄", description = "取得消費類型目錄")
     @GetMapping("/categoryController/categoryIndex")
     public GetCategoryIndexResponse getCategoryIndex(Authentication auth, @RequestParam(required = false) String categoryName,
-                                                     @RequestParam(required = false) boolean isActive, @RequestParam(required = false) boolean isForSaving) {
+                                                     @RequestParam(required = false) Boolean isActive, @RequestParam(required = false) Boolean isForSaving) {
         try {
             var queryCategoryDto = new QueryCategoryDto(null, categoryName, isActive, isForSaving, auth.getName());
             var queryCategoryResultDto = categoryService.queryCategoriesIndex(queryCategoryDto);
